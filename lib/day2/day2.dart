@@ -4,9 +4,10 @@ import 'package:collection/collection.dart';
 
 Future<void> calculate() async {
   final lines = File('lib/day2/input').readAsLinesSync();
+  final symbols = lines.map((line) => line.split(' '));
 
-  var part1 = await _calculatePart1(lines);
-  var part2 = await _calculatePart2(lines);
+  var part1 = await _calculatePart1(symbols);
+  var part2 = await _calculatePart2(symbols);
 
   print('Day 2');
   print('Part 1: $part1');
@@ -14,36 +15,35 @@ Future<void> calculate() async {
   print('');
 }
 
-Future<int> _calculatePart1(Iterable<String> lines) async {
-  final rounds = lines
-      .map((line) => line.split(' ').map((symbol) => Shape.fromSymbol(symbol)));
-  final score = rounds
-      .map((round) =>
-          (round.last.shapeScore + round.last.roundScore(round.first)))
-      .sum;
-  return score;
+Future<int> _calculatePart1(Iterable<Iterable<String>> symbols) async {
+  final rounds = symbols.map(
+    (symbolPair) => symbolPair.map((symbol) => Shape.fromSymbol(symbol)),
+  );
+  return _sumTotalScore(rounds);
 }
 
-Future<int> _calculatePart2(Iterable<String> lines) async {
-  final rounds = lines.map((line) {
-    final symbols = line.split(' ');
-    return Pair<Shape, Result>(
-      Shape.fromSymbol(symbols.first),
-      Result.fromSymbol(symbols.last),
-    );
-  });
-  final score = rounds
-      .map((round) => [
-            round.first,
-            Shape.values.singleWhere(
-              (shape) => shape.roundScore(round.first) == round.second.score,
-            ),
-          ])
-      .map((round) =>
-          (round.last.shapeScore + round.last.roundScore(round.first)))
-      .sum;
-  return score;
+Future<int> _calculatePart2(Iterable<Iterable<String>> symbols) async {
+  final rounds = symbols
+      .map(
+        (symbolPair) => Pair<Shape, Result>(
+          Shape.fromSymbol(symbolPair.first),
+          Result.fromSymbol(symbolPair.last),
+        ),
+      )
+      .map(
+        (round) => [
+          round.first,
+          Shape.values.singleWhere(
+            (shape) => shape.roundScore(round.first) == round.second.score,
+          ),
+        ],
+      );
+  return _sumTotalScore(rounds);
 }
+
+int _sumTotalScore(Iterable<Iterable<Shape>> rounds) => rounds
+    .map((round) => round.last.shapeScore + round.last.roundScore(round.first))
+    .sum;
 
 class Pair<T1, T2> {
   final T1 first;
