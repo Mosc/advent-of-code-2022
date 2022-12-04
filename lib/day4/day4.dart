@@ -14,7 +14,7 @@ Future<void> calculate() async {
   var part1 = await _calculatePart1(sections);
   var part2 = await _calculatePart2(sections);
 
-  print('Day 3');
+  print('Day 4');
   print('Part 1: $part1');
   print('Part 2: $part2');
   print('');
