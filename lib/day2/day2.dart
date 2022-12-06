@@ -1,55 +1,38 @@
-import 'dart:io';
-
+import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-Future<void> calculate() async {
-  final lines = File('lib/day2/input').readAsLinesSync();
-  final symbols = lines.map((line) => line.split(' '));
+class Day2 extends Day<Iterable<Iterable<String>>, Iterable<Iterable<Shape>>> {
+  const Day2() : super(2);
 
-  var part1 = await _calculatePart1(symbols);
-  var part2 = await _calculatePart2(symbols);
+  @override
+  Iterable<Iterable<String>> preprocess(List<String> value) =>
+      value.map((line) => line.split(' '));
 
-  print('Day 2');
-  print('Part 1: $part1');
-  print('Part 2: $part2');
-  print('');
-}
-
-Future<int> _calculatePart1(Iterable<Iterable<String>> symbols) async {
-  final rounds = symbols.map(
-    (symbolPair) => symbolPair.map((symbol) => Shape.fromSymbol(symbol)),
-  );
-  return _sumTotalScore(rounds);
-}
-
-Future<int> _calculatePart2(Iterable<Iterable<String>> symbols) async {
-  final rounds = symbols
-      .map(
-        (symbolPair) => Pair<Shape, Result>(
-          Shape.fromSymbol(symbolPair.first),
-          Result.fromSymbol(symbolPair.last),
-        ),
-      )
-      .map(
-        (round) => [
-          round.first,
-          Shape.values.singleWhere(
-            (shape) => shape.roundScore(round.first) == round.second.score,
-          ),
-        ],
+  @override
+  Iterable<Iterable<Shape>> processPart1(Iterable<Iterable<String>> value) =>
+      value.map(
+        (symbolPair) => symbolPair.map((symbol) => Shape.fromSymbol(symbol)),
       );
-  return _sumTotalScore(rounds);
-}
 
-int _sumTotalScore(Iterable<Iterable<Shape>> rounds) => rounds
-    .map((round) => round.last.shapeScore + round.last.roundScore(round.first))
-    .sum;
+  @override
+  Iterable<Iterable<Shape>> processPart2(Iterable<Iterable<String>> value) =>
+      value.map((symbolPair) {
+        final shape = Shape.fromSymbol(symbolPair.first);
+        final result = Result.fromSymbol(symbolPair.last);
+        return [
+          shape,
+          Shape.values.singleWhere(
+            (ourShape) => ourShape.roundScore(shape) == result.score,
+          ),
+        ];
+      });
 
-class Pair<T1, T2> {
-  final T1 first;
-  final T2 second;
-
-  const Pair(this.first, this.second);
+  @override
+  int postprocess(Iterable<Iterable<Shape>> value) => value
+      .map(
+        (round) => round.last.shapeScore + round.last.roundScore(round.first),
+      )
+      .sum;
 }
 
 enum Shape {

@@ -1,29 +1,20 @@
-import 'dart:io';
-
+import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-Future<void> calculate() async {
-  final lines = File('lib/day1/input').readAsLinesSync();
+class Day1 extends Day<Iterable<int>, int> {
+  const Day1() : super(1);
 
-  final caloriesPerElf =
-      lines.split((line) => line.isEmpty).map((line) => line.map(int.parse));
-  final caloriesSumsPerElf = caloriesPerElf.map((calories) => calories.sum);
+  @override
+  Iterable<int> preprocess(List<String> value) => value
+      .split((line) => line.isEmpty)
+      .map((line) => line.map(int.parse).sum);
 
-  var part1 = await _calculatePart1(caloriesSumsPerElf);
-  var part2 = await _calculatePart2(caloriesSumsPerElf);
+  @override
+  int processPart1(Iterable<int> value) => value.max;
 
-  print('Day 1');
-  print('Part 1: $part1');
-  print('Part 2: $part2');
-  print('');
-}
-
-Future<int> _calculatePart1(Iterable<int> caloriesSums) async {
-  return caloriesSums.max;
-}
-
-Future<int> _calculatePart2(Iterable<int> caloriesSums) async {
-  return caloriesSums.sorted((a, b) => b.compareTo(a)).take(3).sum;
+  @override
+  int processPart2(Iterable<int> value) =>
+      value.sorted((a, b) => b.compareTo(a)).take(3).sum;
 }
 
 extension _Iterablextension<T> on Iterable<T> {

@@ -1,15 +1,22 @@
-import 'package:advent_of_code_2022/day1/day1.dart' as day1;
-import 'package:advent_of_code_2022/day2/day2.dart' as day2;
-import 'package:advent_of_code_2022/day3/day3.dart' as day3;
-import 'package:advent_of_code_2022/day4/day4.dart' as day4;
-import 'package:advent_of_code_2022/day5/day5.dart' as day5;
-import 'package:advent_of_code_2022/day6/day6.dart' as day6;
+import 'package:advent_of_code_2022/day.dart';
+import 'package:advent_of_code_2022/day1/day1.dart';
+import 'package:advent_of_code_2022/day2/day2.dart';
+import 'package:advent_of_code_2022/day3/day3.dart';
+import 'package:advent_of_code_2022/day4/day4.dart';
+import 'package:advent_of_code_2022/day5/day5.dart';
+import 'package:advent_of_code_2022/day6/day6.dart';
 
-Future<void> main(List<String> arguments) async {
-  await day1.calculate();
-  await day2.calculate();
-  await day3.calculate();
-  await day4.calculate();
-  await day5.calculate();
-  await day6.calculate();
+const _days = <Day>[
+  Day1(),
+  Day2(),
+  Day3(),
+  Day4(),
+  Day5(),
+  Day6(),
+];
+
+Future<void> main() async {
+  for (var day in _days) {
+    await day.calculate();
+  }
 }
