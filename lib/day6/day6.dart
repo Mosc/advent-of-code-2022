@@ -22,14 +22,15 @@ Future<int> _calculatePart2(String line) async {
   return _findMarker(line, markerLength: 14);
 }
 
-int _findMarker(String line, {required int markerLength}) {
-  final markerCandidates = line
-      .substring(0, line.length - markerLength + 1)
-      .codeUnits
-      .mapIndexed((index, _) => line.substring(index, index + markerLength));
-  return markerCandidates
-          .map((candidate) => candidate.codeUnits.toSet().length)
-          .toList()
-          .indexOf(markerLength) +
-      markerLength;
-}
+int _findMarker(String line, {required int markerLength}) =>
+    line.codeUnits
+        .sublist(0, line.length - markerLength + 1)
+        .mapIndexed(
+          (index, _) => MapEntry(
+            index,
+            line.codeUnits.sublist(index, index + markerLength).toSet().length,
+          ),
+        )
+        .firstWhere((indexedLength) => indexedLength.value == markerLength)
+        .key +
+    markerLength;
