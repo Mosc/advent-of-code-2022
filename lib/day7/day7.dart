@@ -10,39 +10,25 @@ class Day7 extends Day<Iterable<int>, int> {
     late Directory currentDirectory;
 
     for (final line in value) {
-      final split = line.split(' ');
-      switch (split[0]) {
-        case '\$':
-          final command = split[1];
-          switch (command) {
-            case 'cd':
-              final name = split[2];
-              switch (name) {
-                case '/':
-                  currentDirectory = root;
-                  break;
-                case '..':
-                  currentDirectory = currentDirectory.parent!;
-                  break;
-                default:
-                  currentDirectory = currentDirectory.directories
-                      .singleWhere((directory) => directory.name == name);
-              }
+      final tokens = line.split(' ');
+
+      if (tokens[0] == r'$') {
+        if (tokens[1] == 'cd') {
+          if (tokens[2] == '/') {
+            currentDirectory = root;
+          } else if (tokens[2] == '..') {
+            currentDirectory = currentDirectory.parent!;
+          } else {
+            currentDirectory = currentDirectory = currentDirectory.directories
+                .singleWhere((directory) => directory.name == tokens[2]);
           }
-          break;
-        case 'dir':
-          final name = split[1];
-          currentDirectory.directories.add(
-            Directory(parent: currentDirectory, name: name),
-          );
-          break;
-        default:
-          final size = int.parse(split[0]);
-          final name = split[1];
-          currentDirectory.files.add(
-            File(name: name, size: size),
-          );
-          break;
+        }
+      } else if (tokens[0] == 'dir') {
+        currentDirectory.directories
+            .add(Directory(parent: currentDirectory, name: tokens[1]));
+      } else {
+        currentDirectory.files
+            .add(File(name: tokens[1], size: int.parse(tokens[0])));
       }
     }
 
