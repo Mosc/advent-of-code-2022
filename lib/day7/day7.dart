@@ -60,6 +60,65 @@ class Day7 extends Day<List<String>, int> {
         .sum;
   }
 
+  @override
+  int processPart2(List<String> value) {
+    var currentDirectory = Directory();
+
+    for (final line in value) {
+      final split = line.split(' ');
+
+      switch (split[0]) {
+        case '\$':
+          final command = split[1];
+          switch (command) {
+            case 'cd':
+              final name = split[2];
+              switch (name) {
+                case '/':
+                  while (currentDirectory.parent != null) {
+                    currentDirectory = currentDirectory.parent!;
+                  }
+                  break;
+                case '..':
+                  currentDirectory = currentDirectory.parent!;
+                  break;
+                default:
+                  currentDirectory = currentDirectory.directories
+                      .singleWhere((directory) => directory.name == name);
+              }
+          }
+          break;
+        case 'dir':
+          final name = split[1];
+          currentDirectory.directories.add(
+            Directory(parent: currentDirectory, name: name),
+          );
+          break;
+        default:
+          final size = int.parse(split[0]);
+          final name = split[1];
+          currentDirectory.files.add(
+            File(name: name, size: size),
+          );
+          break;
+      }
+    }
+
+    while (currentDirectory.parent != null) {
+      currentDirectory = currentDirectory.parent!;
+    }
+
+    const totalSize = 70000000;
+    const requiredSize = 30000000;
+    final unusedSize = totalSize - currentDirectory.size;
+
+    final flattenedDirectory = _flattenDirectory(currentDirectory);
+    return flattenedDirectory
+        .map((directory) => directory.size)
+        .sorted((a, b) => a.compareTo(b))
+        .firstWhere((size) => unusedSize + size >= requiredSize);
+  }
+
   Iterable<Directory> _flattenDirectory(Directory currentDirectory) sync* {
     yield currentDirectory;
 
