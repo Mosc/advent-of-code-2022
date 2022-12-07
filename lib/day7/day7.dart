@@ -6,11 +6,11 @@ class Day7 extends Day<Iterable<int>, int> {
 
   @override
   Iterable<int> preprocess(List<String> value) {
-    var currentDirectory = Directory();
+    final root = Directory();
+    late Directory currentDirectory;
 
     for (final line in value) {
       final split = line.split(' ');
-
       switch (split[0]) {
         case '\$':
           final command = split[1];
@@ -19,9 +19,7 @@ class Day7 extends Day<Iterable<int>, int> {
               final name = split[2];
               switch (name) {
                 case '/':
-                  while (currentDirectory.parent != null) {
-                    currentDirectory = currentDirectory.parent!;
-                  }
+                  currentDirectory = root;
                   break;
                 case '..':
                   currentDirectory = currentDirectory.parent!;
@@ -48,12 +46,7 @@ class Day7 extends Day<Iterable<int>, int> {
       }
     }
 
-    while (currentDirectory.parent != null) {
-      currentDirectory = currentDirectory.parent!;
-    }
-
-    return _flattenDirectory(currentDirectory)
-        .map((directory) => directory.size);
+    return _flattenDirectory(root).map((directory) => directory.size);
   }
 
   @override
