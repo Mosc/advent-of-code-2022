@@ -1,11 +1,11 @@
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day7 extends Day<List<String>, int> {
+class Day7 extends Day<Iterable<int>, int> {
   const Day7() : super(7);
 
   @override
-  int processPart1(List<String> value) {
+  Iterable<int> preprocess(List<String> value) {
     var currentDirectory = Directory();
 
     for (final line in value) {
@@ -52,69 +52,24 @@ class Day7 extends Day<List<String>, int> {
       currentDirectory = currentDirectory.parent!;
     }
 
-    const maxSize = 100000;
-
     return _flattenDirectory(currentDirectory)
-        .map((directory) => directory.size)
-        .where((size) => size <= maxSize)
-        .sum;
+        .map((directory) => directory.size);
   }
 
   @override
-  int processPart2(List<String> value) {
-    var currentDirectory = Directory();
+  int processPart1(Iterable<int> value) {
+    const maxSize = 100000;
 
-    for (final line in value) {
-      final split = line.split(' ');
+    return value.where((size) => size <= maxSize).sum;
+  }
 
-      switch (split[0]) {
-        case '\$':
-          final command = split[1];
-          switch (command) {
-            case 'cd':
-              final name = split[2];
-              switch (name) {
-                case '/':
-                  while (currentDirectory.parent != null) {
-                    currentDirectory = currentDirectory.parent!;
-                  }
-                  break;
-                case '..':
-                  currentDirectory = currentDirectory.parent!;
-                  break;
-                default:
-                  currentDirectory = currentDirectory.directories
-                      .singleWhere((directory) => directory.name == name);
-              }
-          }
-          break;
-        case 'dir':
-          final name = split[1];
-          currentDirectory.directories.add(
-            Directory(parent: currentDirectory, name: name),
-          );
-          break;
-        default:
-          final size = int.parse(split[0]);
-          final name = split[1];
-          currentDirectory.files.add(
-            File(name: name, size: size),
-          );
-          break;
-      }
-    }
-
-    while (currentDirectory.parent != null) {
-      currentDirectory = currentDirectory.parent!;
-    }
-
+  @override
+  int processPart2(Iterable<int> value) {
     const totalSize = 70000000;
     const requiredSize = 30000000;
-    final unusedSize = totalSize - currentDirectory.size;
+    final unusedSize = totalSize - value.first;
 
-    final flattenedDirectory = _flattenDirectory(currentDirectory);
-    return flattenedDirectory
-        .map((directory) => directory.size)
+    return value
         .sorted((a, b) => a.compareTo(b))
         .firstWhere((size) => unusedSize + size >= requiredSize);
   }
