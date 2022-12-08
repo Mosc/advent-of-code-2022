@@ -1,28 +1,27 @@
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day8 extends Day<List<String>, int> {
+class Day8 extends Day<List<List<Tree>>, int> {
   const Day8() : super(8);
 
   @override
-  int processPart1(List<String> value) {
-    final matrix = <List<Tree>>[];
-
-    for (final line in value) {
-      matrix.add(
-        line
+  List<List<Tree>> preprocess(List<String> value) => value
+      .map(
+        (line) => line
             .split('')
             .map((height) => Tree(int.parse(height)))
             .toList(growable: false),
-      );
-    }
+      )
+      .toList(growable: false);
 
-    for (int i = 0; i < matrix.length; i++) {
-      final currentRow = matrix[i];
+  @override
+  int processPart1(List<List<Tree>> value) {
+    for (int i = 0; i < value.length; i++) {
+      final currentRow = value[i];
 
       for (int j = 0; j < currentRow.length; j++) {
         final currentColumn =
-            matrix.map((row) => row[j]).toList(growable: false);
+            value.map((row) => row[j]).toList(growable: false);
         final currentTree = currentRow[j];
 
         if (currentRow
@@ -42,7 +41,41 @@ class Day8 extends Day<List<String>, int> {
       }
     }
 
-    return matrix.map((row) => row.where((tree) => tree.visible).length).sum;
+    return value.map((row) => row.where((tree) => tree.visible).length).sum;
+  }
+
+  @override
+  int processPart2(List<List<Tree>> value) {
+    for (int i = 0; i < value.length; i++) {
+      final currentRow = value[i];
+
+      for (int j = 0; j < currentRow.length; j++) {
+        final currentColumn =
+            value.map((row) => row[j]).toList(growable: false);
+        final currentTree = currentRow[j];
+
+        final left = currentTree.calculateViewingDistance(
+          currentRow.sublist(0, j).reversed.toList(),
+          orElse: () => j,
+        );
+        final right = currentTree.calculateViewingDistance(
+          currentRow.sublist(j + 1),
+          orElse: () => currentRow.length - j - 1,
+        );
+        final up = currentTree.calculateViewingDistance(
+          currentColumn.sublist(0, i).reversed.toList(),
+          orElse: () => i,
+        );
+        final down = currentTree.calculateViewingDistance(
+          currentColumn.sublist(i + 1),
+          orElse: () => currentColumn.length - i - 1,
+        );
+
+        currentTree.score = left * right * up * down;
+      }
+    }
+
+    return value.map((row) => row.map((tree) => tree.score).max).max;
   }
 }
 
@@ -51,11 +84,17 @@ class Tree {
 
   final int height;
   bool _visible;
+  late int score;
 
   get visible => _visible;
 
   setInvisible() => _visible = false;
 
-  @override
-  String toString() => '$height: $visible';
+  int calculateViewingDistance(
+    List<Tree> trees, {
+    required int Function() orElse,
+  }) {
+    final value = trees.indexWhere((tree) => tree.height >= height);
+    return value != -1 ? value + 1 : orElse();
+  }
 }
