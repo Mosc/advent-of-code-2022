@@ -7,6 +7,7 @@ import 'package:advent_of_code_2022/day5/day5.dart';
 import 'package:advent_of_code_2022/day6/day6.dart';
 import 'package:advent_of_code_2022/day7/day7.dart';
 import 'package:advent_of_code_2022/day8/day8.dart';
+import 'package:advent_of_code_2022/day9/day9.dart';
 
 const _days = <Day>[
   Day1(),
@@ -17,6 +18,7 @@ const _days = <Day>[
   Day6(),
   Day7(),
   Day8(),
+  Day9(),
 ];
 
 Future<void> main() async {
