@@ -10,13 +10,26 @@ abstract class Day<IN, OUT> {
   FutureOr<void> calculate() async {
     final lines = File('lib/day$number/${example ? 'example' : 'input'}')
         .readAsLinesSync();
-    final part1 = await processPart1(await preprocess(lines));
-    final part2 = await processPart2(await preprocess(lines));
 
     print('Day $number');
-    if (part1 != null) print('Part 1: ${await postprocess(part1)}');
-    if (part2 != null) print('Part 2: ${await postprocess(part2)}');
+    await calculatePart(1, processPart1, lines: lines);
+    await calculatePart(2, processPart2, lines: lines);
     print('');
+  }
+
+  Future<void> calculatePart(
+    int i,
+    FutureOr<OUT?> Function(IN value) process, {
+    required List<String> lines,
+  }) async {
+    final stopwatch = Stopwatch()..start();
+    final part = await process(await preprocess(lines));
+
+    if (part != null) {
+      final postPart = await postprocess(part);
+      stopwatch.stop();
+      print('Part $i: $postPart (${stopwatch.elapsedMilliseconds}ms)');
+    }
   }
 
   FutureOr<IN> preprocess(List<String> value) => value as IN;
