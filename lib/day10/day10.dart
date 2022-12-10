@@ -9,7 +9,7 @@ class Day10 extends Day<List<String>, String> {
     final interestingCycles =
         List<int>.generate(6, (index) => index * 40 + 20, growable: false);
     final signalStrengths = <int, int>{};
-    var cycle = 1;
+    var cycle = 0;
     var x = 1;
 
     for (final line in value) {
@@ -23,8 +23,8 @@ class Day10 extends Day<List<String>, String> {
       }
 
       for (var i = 0; i < op.cycleLength; i++) {
-        signalStrengths[cycle] = cycle * x;
         cycle++;
+        signalStrengths[cycle] = cycle * x;
       }
 
       op.execute?.call();
@@ -43,7 +43,7 @@ class Day10 extends Day<List<String>, String> {
   String processPart2(List<String> value) {
     const rowLength = 40;
     final crt = <List<bool>>[];
-    var cycle = 1;
+    var cycle = 0;
     var x = 1;
 
     for (final line in value) {
@@ -57,14 +57,13 @@ class Day10 extends Day<List<String>, String> {
       }
 
       for (var i = 0; i < op.cycleLength; i++) {
-        final row = (cycle - 1) ~/ rowLength;
+        final row = cycle ~/ rowLength;
 
         if (row > crt.length - 1) {
           crt.add(<bool>[]);
         }
 
-        crt[row].add((cycle % rowLength - x - 1).abs() <= 1);
-
+        crt[row].add((cycle % rowLength - x).abs() <= 1);
         cycle++;
       }
 
