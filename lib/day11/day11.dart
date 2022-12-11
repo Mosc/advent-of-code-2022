@@ -6,6 +6,20 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
 
   @override
   List<Monkey> preprocess(List<String> input) {
+    Operator parseOperator(String operator) {
+      switch (operator) {
+        case '+':
+          return Operator.add;
+        case '*':
+          return Operator.multiply;
+      }
+
+      throw Exception();
+    }
+
+    int? parseOperationPart(String part) =>
+        part == 'old' ? null : int.parse(part);
+
     final monkeys = <Monkey>[];
 
     for (int i = 0; i < input.length; i += 7) {
@@ -15,7 +29,11 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
           .map((line) => line.split(':').last.trim())
           .toList();
       final startingItems = monkeyLines[1].split(', ').map(int.parse).toList();
-      final operation = monkeyLines[2].split('=')[1].trim().split(' ').toList();
+      final operationParts =
+          monkeyLines[2].split('=')[1].trim().split(' ').toList();
+      final operator = parseOperator(operationParts[1]);
+      final operationLeft = parseOperationPart(operationParts[0]);
+      final operationRight = parseOperationPart(operationParts[2]);
       final testDivisibleBy = int.parse(monkeyLines[3].split(' ').last);
       final ifTestTrueThrowTo = int.parse(monkeyLines[4].split(' ').last);
       final ifTestFalseThrowTo = int.parse(monkeyLines[5].split(' ').last);
@@ -23,7 +41,9 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
       monkeys.add(
         Monkey(
           items: startingItems,
-          operation: operation,
+          operator: operator,
+          operationLeft: operationLeft,
+          operationRight: operationRight,
           testDivisibleBy: testDivisibleBy,
           ifTestTrueThrowTo: ifTestTrueThrowTo,
           ifTestFalseThrowTo: ifTestFalseThrowTo,
@@ -45,14 +65,14 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
 
   @override
   List<Monkey> processPart2(List<Monkey> input) {
-    final commonMultiplier = input
+    final commonMultiple = input
         .map((monkey) => monkey.testDivisibleBy)
         .fold(1, (total, divisibleBy) => total * divisibleBy);
 
     return _playRounds(
       input,
       rounds: 10000,
-      manageWorryLevel: (worryLevel) => worryLevel %= commonMultiplier,
+      manageWorryLevel: (worryLevel) => worryLevel %= commonMultiple,
     );
   }
 
@@ -84,14 +104,18 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
 class Monkey {
   Monkey({
     required this.items,
-    required this.operation,
+    required this.operator,
+    required this.operationLeft,
+    required this.operationRight,
     required this.testDivisibleBy,
     required this.ifTestTrueThrowTo,
     required this.ifTestFalseThrowTo,
   }) : inspections = 0;
 
   final List<int> items;
-  final List<String> operation;
+  final Operator operator;
+  final int? operationLeft;
+  final int? operationRight;
   final int testDivisibleBy;
   final int ifTestTrueThrowTo;
   final int ifTestFalseThrowTo;
@@ -103,19 +127,12 @@ class Monkey {
     required int Function(int worryLevel) manageWorryLevel,
   }) {
     for (var item in items) {
-      int parseOperation(String part) => part == 'old' ? item : int.parse(part);
-
       var worryLevel = item;
 
-      final left = parseOperation(operation[0]);
-      final right = parseOperation(operation[2]);
-
-      if (operation[1] == '+') {
-        worryLevel = left + right;
-      } else if (operation[1] == '*') {
-        worryLevel = left * right;
-      }
-
+      worryLevel = operator.run(
+        operationLeft ?? worryLevel,
+        operationRight ?? worryLevel,
+      );
       worryLevel = manageWorryLevel(worryLevel);
 
       final throwTo = worryLevel % testDivisibleBy == 0
@@ -130,4 +147,20 @@ class Monkey {
   }
 
   void addItem(int item) => items.add(item);
+}
+
+enum Operator {
+  add,
+  multiply;
+
+  const Operator();
+
+  int run(int left, int right) {
+    switch (this) {
+      case add:
+        return left + right;
+      case multiply:
+        return left * right;
+    }
+  }
 }
