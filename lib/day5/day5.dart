@@ -6,12 +6,12 @@ class Day5 extends Day<Procedure, Iterable<Queue<String>>> {
   const Day5() : super(5);
 
   @override
-  Procedure preprocess(List<String> value) {
-    final stackEndIndex = value.indexOf('');
+  Procedure preprocess(List<String> input) {
+    final stackEndIndex = input.indexOf('');
     final stacks = <int, Queue<String>>{};
     final rearrangements = <Rearrangement>[];
 
-    for (final line in value.sublist(0, stackEndIndex - 1)) {
+    for (final line in input.sublist(0, stackEndIndex - 1)) {
       final stackCount = (line.length + 1) ~/ 4;
 
       for (var i = 1; i < stackCount + 1; i++) {
@@ -27,7 +27,7 @@ class Day5 extends Day<Procedure, Iterable<Queue<String>>> {
       }
     }
 
-    for (final line in value.sublist(stackEndIndex + 1)) {
+    for (final line in input.sublist(stackEndIndex + 1)) {
       final words = line.split(' ');
       final amount = int.parse(words[1]);
       final from = int.parse(words[3]);
@@ -39,36 +39,36 @@ class Day5 extends Day<Procedure, Iterable<Queue<String>>> {
   }
 
   @override
-  Iterable<Queue<String>> processPart1(Procedure value) {
-    for (final rearrangement in value.rearrangements) {
+  Iterable<Queue<String>> processPart1(Procedure input) {
+    for (final rearrangement in input.rearrangements) {
       for (int i = 0; i < rearrangement.amount; i++) {
-        final crate = value.stacks[rearrangement.from]!.removeLast();
-        value.stacks[rearrangement.to]!.addLast(crate);
+        final crate = input.stacks[rearrangement.from]!.removeLast();
+        input.stacks[rearrangement.to]!.addLast(crate);
       }
     }
 
-    return value.stacks.values;
+    return input.stacks.values;
   }
 
   @override
-  Iterable<Queue<String>> processPart2(Procedure value) {
-    for (final rearrangement in value.rearrangements) {
-      final crates = value.stacks[rearrangement.from]!.toList().sublist(
-            value.stacks[rearrangement.from]!.length - rearrangement.amount,
+  Iterable<Queue<String>> processPart2(Procedure input) {
+    for (final rearrangement in input.rearrangements) {
+      final crates = input.stacks[rearrangement.from]!.toList().sublist(
+            input.stacks[rearrangement.from]!.length - rearrangement.amount,
           );
 
       for (final crate in crates) {
-        value.stacks[rearrangement.from]!.removeLast();
-        value.stacks[rearrangement.to]!.addLast(crate);
+        input.stacks[rearrangement.from]!.removeLast();
+        input.stacks[rearrangement.to]!.addLast(crate);
       }
     }
 
-    return value.stacks.values;
+    return input.stacks.values;
   }
 
   @override
-  String postprocess(Iterable<Queue<String>> value) =>
-      value.map((stack) => stack.last).join();
+  String postprocess(Iterable<Queue<String>> input) =>
+      input.map((stack) => stack.last).join();
 }
 
 class Procedure {

@@ -6,15 +6,15 @@ class Day9 extends Day<List<String>, Set<Point<int>>> {
   const Day9() : super(9);
 
   @override
-  Set<Point<int>> processPart1(List<String> value) =>
-      _getVisited(value, length: 2);
+  Set<Point<int>> processPart1(List<String> input) =>
+      _getVisited(input, length: 2);
 
   @override
-  Set<Point<int>> processPart2(List<String> value) =>
-      _getVisited(value, length: 10);
+  Set<Point<int>> processPart2(List<String> input) =>
+      _getVisited(input, length: 10);
 
   @override
-  int postprocess(Set<Point<int>> value) => value.length;
+  int postprocess(Set<Point<int>> input) => input.length;
 
   Set<Point<int>> _getVisited(List<String> value, {required int length}) {
     final knots = List<Point<int>>.generate(length, (_) => const Point(0, 0));

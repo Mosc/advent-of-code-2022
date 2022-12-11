@@ -5,7 +5,7 @@ class Day8 extends Day<List<List<Tree>>, int> {
   const Day8() : super(8);
 
   @override
-  List<List<Tree>> preprocess(List<String> value) => value
+  List<List<Tree>> preprocess(List<String> input) => input
       .map(
         (line) => line
             .split('')
@@ -15,13 +15,13 @@ class Day8 extends Day<List<List<Tree>>, int> {
       .toList(growable: false);
 
   @override
-  int processPart1(List<List<Tree>> value) {
-    for (int i = 0; i < value.length; i++) {
-      final currentRow = value[i];
+  int processPart1(List<List<Tree>> input) {
+    for (int i = 0; i < input.length; i++) {
+      final currentRow = input[i];
 
       for (int j = 0; j < currentRow.length; j++) {
         final currentColumn =
-            value.map((row) => row[j]).toList(growable: false);
+            input.map((row) => row[j]).toList(growable: false);
         final currentTree = currentRow[j];
 
         if (currentRow
@@ -41,17 +41,17 @@ class Day8 extends Day<List<List<Tree>>, int> {
       }
     }
 
-    return value.map((row) => row.where((tree) => tree.visible).length).sum;
+    return input.map((row) => row.where((tree) => tree.visible).length).sum;
   }
 
   @override
-  int processPart2(List<List<Tree>> value) {
-    for (int i = 0; i < value.length; i++) {
-      final currentRow = value[i];
+  int processPart2(List<List<Tree>> input) {
+    for (int i = 0; i < input.length; i++) {
+      final currentRow = input[i];
 
       for (int j = 0; j < currentRow.length; j++) {
         final currentColumn =
-            value.map((row) => row[j]).toList(growable: false);
+            input.map((row) => row[j]).toList(growable: false);
         final currentTree = currentRow[j];
 
         final left = currentTree.calculateViewingDistance(
@@ -75,7 +75,7 @@ class Day8 extends Day<List<List<Tree>>, int> {
       }
     }
 
-    return value.map((row) => row.map((tree) => tree.score).max).max;
+    return input.map((row) => row.map((tree) => tree.score).max).max;
   }
 }
 

@@ -5,14 +5,14 @@ class Day10 extends Day<List<String>, String> {
   const Day10() : super(10);
 
   @override
-  String processPart1(List<String> value) {
+  String processPart1(List<String> input) {
     final interestingCycles =
         List<int>.generate(6, (index) => index * 40 + 20, growable: false);
     final signalStrengths = <int, int>{};
     var cycle = 0;
     var x = 1;
 
-    for (final line in value) {
+    for (final line in input) {
       final tokens = line.split(' ');
       late final Op op;
 
@@ -40,13 +40,13 @@ class Day10 extends Day<List<String>, String> {
   }
 
   @override
-  String processPart2(List<String> value) {
+  String processPart2(List<String> input) {
     const rowLength = 40;
     final crt = <List<bool>>[];
     var cycle = 0;
     var x = 1;
 
-    for (final line in value) {
+    for (final line in input) {
       final tokens = line.split(' ');
       late final Op op;
 

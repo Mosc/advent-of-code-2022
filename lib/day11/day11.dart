@@ -5,11 +5,11 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
   const Day11() : super(11);
 
   @override
-  List<Monkey> preprocess(List<String> value) {
+  List<Monkey> preprocess(List<String> input) {
     final monkeys = <Monkey>[];
 
-    for (int i = 0; i < value.length; i += 7) {
-      final monkeyLines = value
+    for (int i = 0; i < input.length; i += 7) {
+      final monkeyLines = input
           .skip(i)
           .take(6)
           .map((line) => line.split(':').last.trim())
@@ -35,42 +35,42 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
   }
 
   @override
-  List<Monkey> processPart1(List<Monkey> value) {
+  List<Monkey> processPart1(List<Monkey> input) {
     const rounds = 20;
 
     for (int round = 0; round < rounds; round++) {
-      for (final monkey in value) {
+      for (final monkey in input) {
         monkey.play(
-          value,
+          input,
           manageWorryLevel: (worryLevel) => worryLevel ~/ 3,
         );
       }
     }
 
-    return value;
+    return input;
   }
 
   @override
-  List<Monkey> processPart2(List<Monkey> value) {
+  List<Monkey> processPart2(List<Monkey> input) {
     const rounds = 10000;
-    final commonMultiplier = value
+    final commonMultiplier = input
         .map((monkey) => monkey.testDivisibleBy)
         .fold(1, (total, divisibleBy) => total * divisibleBy);
 
     for (int round = 0; round < rounds; round++) {
-      for (final monkey in value) {
+      for (final monkey in input) {
         monkey.play(
-          value,
+          input,
           manageWorryLevel: (worryLevel) => worryLevel %= commonMultiplier,
         );
       }
     }
 
-    return value;
+    return input;
   }
 
   @override
-  int postprocess(List<Monkey> value) => value
+  int postprocess(List<Monkey> input) => input
       .map((monkey) => monkey.inspections)
       .sorted((a, b) => b.compareTo(a))
       .take(2)

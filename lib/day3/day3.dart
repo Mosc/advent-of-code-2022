@@ -5,8 +5,8 @@ class Day3 extends Day<List<String>, Iterable<Iterable<Set<String>>>> {
   const Day3() : super(3);
 
   @override
-  Iterable<Iterable<Set<String>>> processPart1(List<String> value) =>
-      value.map((line) {
+  Iterable<Iterable<Set<String>>> processPart1(List<String> input) =>
+      input.map((line) {
         final halfWay = line.length ~/ 2;
         return [
           line.substring(0, halfWay),
@@ -15,7 +15,7 @@ class Day3 extends Day<List<String>, Iterable<Iterable<Set<String>>>> {
       });
 
   @override
-  Iterable<Iterable<Set<String>>> processPart2(List<String> value) => value
+  Iterable<Iterable<Set<String>>> processPart2(List<String> input) => input
       .asMap()
       .entries
       .groupListsBy((indexedLine) => indexedLine.key ~/ 3)
@@ -27,7 +27,7 @@ class Day3 extends Day<List<String>, Iterable<Iterable<Set<String>>>> {
       );
 
   @override
-  int postprocess(Iterable<Iterable<Set<String>>> value) => value.map(
+  int postprocess(Iterable<Iterable<Set<String>>> input) => input.map(
         (group) {
           final duplicate = group
               .fold(

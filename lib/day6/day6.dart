@@ -5,13 +5,13 @@ class Day6 extends Day<List<int>, int> {
   const Day6() : super(6);
 
   @override
-  List<int> preprocess(List<String> value) => value.single.codeUnits;
+  List<int> preprocess(List<String> input) => input.single.codeUnits;
 
   @override
-  int processPart1(List<int> value) => _findMarker(value, markerLength: 4);
+  int processPart1(List<int> input) => _findMarker(input, markerLength: 4);
 
   @override
-  int processPart2(List<int> value) => _findMarker(value, markerLength: 14);
+  int processPart2(List<int> input) => _findMarker(input, markerLength: 14);
 
   int _findMarker(List<int> input, {required int markerLength}) =>
       input

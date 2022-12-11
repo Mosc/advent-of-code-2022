@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-abstract class Day<IN, OUT> {
+abstract class Day<T, U> {
   const Day(this.number, {this.example = false});
 
   final int number;
@@ -19,7 +19,7 @@ abstract class Day<IN, OUT> {
 
   Future<void> calculatePart(
     int i,
-    FutureOr<OUT?> Function(IN value) process, {
+    FutureOr<U?> Function(T value) process, {
     required List<String> lines,
   }) async {
     final stopwatch = Stopwatch()..start();
@@ -32,11 +32,11 @@ abstract class Day<IN, OUT> {
     }
   }
 
-  FutureOr<IN> preprocess(List<String> value) => value as IN;
+  FutureOr<T> preprocess(List<String> input) => input as T;
 
-  FutureOr<OUT?> processPart1(IN value) => null;
+  FutureOr<U?> processPart1(T input) => null;
 
-  FutureOr<OUT?> processPart2(IN value) => null;
+  FutureOr<U?> processPart2(T input) => null;
 
-  FutureOr<Object> postprocess(OUT value) => value.toString();
+  FutureOr<Object> postprocess(U input) => input.toString();
 }

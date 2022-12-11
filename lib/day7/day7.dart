@@ -5,11 +5,11 @@ class Day7 extends Day<Iterable<int>, int> {
   const Day7() : super(7);
 
   @override
-  Iterable<int> preprocess(List<String> value) {
+  Iterable<int> preprocess(List<String> input) {
     final root = Directory();
     late Directory currentDirectory;
 
-    for (final line in value) {
+    for (final line in input) {
       final tokens = line.split(' ');
 
       if (tokens[0] == r'$') {
@@ -36,19 +36,19 @@ class Day7 extends Day<Iterable<int>, int> {
   }
 
   @override
-  int processPart1(Iterable<int> value) {
+  int processPart1(Iterable<int> input) {
     const maxSize = 100000;
 
-    return value.where((size) => size <= maxSize).sum;
+    return input.where((size) => size <= maxSize).sum;
   }
 
   @override
-  int processPart2(Iterable<int> value) {
+  int processPart2(Iterable<int> input) {
     const totalSize = 70000000;
     const requiredSize = 30000000;
-    final unusedSize = totalSize - value.first;
+    final unusedSize = totalSize - input.first;
 
-    return value
+    return input
         .sorted((a, b) => a.compareTo(b))
         .firstWhere((size) => unusedSize + size >= requiredSize);
   }

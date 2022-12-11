@@ -5,16 +5,16 @@ class Day1 extends Day<Iterable<int>, int> {
   const Day1() : super(1);
 
   @override
-  Iterable<int> preprocess(List<String> value) => value
+  Iterable<int> preprocess(List<String> input) => input
       .split((line) => line.isEmpty)
       .map((line) => line.map(int.parse).sum);
 
   @override
-  int processPart1(Iterable<int> value) => value.max;
+  int processPart1(Iterable<int> input) => input.max;
 
   @override
-  int processPart2(Iterable<int> value) =>
-      value.sorted((a, b) => b.compareTo(a)).take(3).sum;
+  int processPart2(Iterable<int> input) =>
+      input.sorted((a, b) => b.compareTo(a)).take(3).sum;
 }
 
 extension _Iterablextension<T> on Iterable<T> {

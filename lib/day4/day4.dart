@@ -5,7 +5,7 @@ class Day4
   const Day4() : super(4);
 
   @override
-  Iterable<Iterable<Set<int>>> preprocess(Iterable<String> value) => value.map(
+  Iterable<Iterable<Set<int>>> preprocess(Iterable<String> input) => input.map(
         (line) => line.split(',').map((sections) {
           final split = sections.split('-').map(int.parse);
           final from = split.first;
@@ -16,9 +16,9 @@ class Day4
 
   @override
   Iterable<Iterable<Set<int>>> processPart1(
-    Iterable<Iterable<Set<int>>> value,
+    Iterable<Iterable<Set<int>>> input,
   ) =>
-      value.where(
+      input.where(
         (sectionPair) =>
             (sectionPair.first..removeAll(sectionPair.last)).isEmpty ||
             (sectionPair.last..removeAll(sectionPair.first)).isEmpty,
@@ -26,13 +26,13 @@ class Day4
 
   @override
   Iterable<Iterable<Set<int>>> processPart2(
-    Iterable<Iterable<Set<int>>> value,
+    Iterable<Iterable<Set<int>>> input,
   ) =>
-      value.where(
+      input.where(
         (sectionPair) =>
             sectionPair.first.intersection(sectionPair.last).isNotEmpty,
       );
 
   @override
-  int postprocess(Iterable<Iterable<Set<int>>> value) => value.length;
+  int postprocess(Iterable<Iterable<Set<int>>> input) => input.length;
 }

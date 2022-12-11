@@ -5,18 +5,18 @@ class Day2 extends Day<Iterable<Iterable<String>>, Iterable<Iterable<Shape>>> {
   const Day2() : super(2);
 
   @override
-  Iterable<Iterable<String>> preprocess(List<String> value) =>
-      value.map((line) => line.split(' '));
+  Iterable<Iterable<String>> preprocess(List<String> input) =>
+      input.map((line) => line.split(' '));
 
   @override
-  Iterable<Iterable<Shape>> processPart1(Iterable<Iterable<String>> value) =>
-      value.map(
+  Iterable<Iterable<Shape>> processPart1(Iterable<Iterable<String>> input) =>
+      input.map(
         (symbolPair) => symbolPair.map((symbol) => Shape.fromSymbol(symbol)),
       );
 
   @override
-  Iterable<Iterable<Shape>> processPart2(Iterable<Iterable<String>> value) =>
-      value.map((symbolPair) {
+  Iterable<Iterable<Shape>> processPart2(Iterable<Iterable<String>> input) =>
+      input.map((symbolPair) {
         final shape = Shape.fromSymbol(symbolPair.first);
         final result = Result.fromSymbol(symbolPair.last);
         return [
@@ -28,7 +28,7 @@ class Day2 extends Day<Iterable<Iterable<String>>, Iterable<Iterable<Shape>>> {
       });
 
   @override
-  int postprocess(Iterable<Iterable<Shape>> value) => value
+  int postprocess(Iterable<Iterable<Shape>> input) => input
       .map(
         (round) => round.last.shapeScore + round.last.roundScore(round.first),
       )
