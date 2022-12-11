@@ -36,37 +36,24 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
 
   @override
   List<Monkey> processPart1(List<Monkey> input) {
-    const rounds = 20;
-
-    for (int round = 0; round < rounds; round++) {
-      for (final monkey in input) {
-        monkey.play(
-          input,
-          manageWorryLevel: (worryLevel) => worryLevel ~/ 3,
-        );
-      }
-    }
-
-    return input;
+    return _playRounds(
+      input,
+      rounds: 20,
+      manageWorryLevel: (worryLevel) => worryLevel ~/ 3,
+    );
   }
 
   @override
   List<Monkey> processPart2(List<Monkey> input) {
-    const rounds = 10000;
     final commonMultiplier = input
         .map((monkey) => monkey.testDivisibleBy)
         .fold(1, (total, divisibleBy) => total * divisibleBy);
 
-    for (int round = 0; round < rounds; round++) {
-      for (final monkey in input) {
-        monkey.play(
-          input,
-          manageWorryLevel: (worryLevel) => worryLevel %= commonMultiplier,
-        );
-      }
-    }
-
-    return input;
+    return _playRounds(
+      input,
+      rounds: 10000,
+      manageWorryLevel: (worryLevel) => worryLevel %= commonMultiplier,
+    );
   }
 
   @override
@@ -75,6 +62,23 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
       .sorted((a, b) => b.compareTo(a))
       .take(2)
       .reduce((total, inspections) => total * inspections);
+
+  List<Monkey> _playRounds(
+    List<Monkey> monkeys, {
+    required int rounds,
+    required int Function(int worryLevel) manageWorryLevel,
+  }) {
+    for (int round = 0; round < rounds; round++) {
+      for (final monkey in monkeys) {
+        monkey.play(
+          monkeys,
+          manageWorryLevel: manageWorryLevel,
+        );
+      }
+    }
+
+    return monkeys;
+  }
 }
 
 class Monkey {
@@ -99,10 +103,12 @@ class Monkey {
     required int Function(int worryLevel) manageWorryLevel,
   }) {
     for (var item in items) {
+      int parseOperation(String part) => part == 'old' ? item : int.parse(part);
+
       var worryLevel = item;
 
-      final left = operation[0] == 'old' ? item : int.parse(operation[0]);
-      final right = operation[2] == 'old' ? item : int.parse(operation[2]);
+      final left = parseOperation(operation[0]);
+      final right = parseOperation(operation[2]);
 
       if (operation[1] == '+') {
         worryLevel = left + right;
