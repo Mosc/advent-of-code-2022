@@ -1,11 +1,11 @@
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day11 extends Day<List<String>, int> {
+class Day11 extends Day<List<Monkey>, List<Monkey>> {
   const Day11() : super(11);
 
   @override
-  int processPart1(List<String> value) {
+  List<Monkey> preprocess(List<String> value) {
     final monkeys = <Monkey>[];
 
     for (int i = 0; i < value.length; i += 7) {
@@ -31,18 +31,50 @@ class Day11 extends Day<List<String>, int> {
       );
     }
 
-    for (int round = 0; round < 20; round++) {
-      for (final monkey in monkeys) {
-        monkey.play(monkeys);
+    return monkeys;
+  }
+
+  @override
+  List<Monkey> processPart1(List<Monkey> value) {
+    const rounds = 20;
+
+    for (int round = 0; round < rounds; round++) {
+      for (final monkey in value) {
+        monkey.play(
+          value,
+          manageWorryLevel: (worryLevel) => worryLevel ~/ 3,
+        );
       }
     }
 
-    return monkeys
-        .map((monkey) => monkey.inspections)
-        .sorted((a, b) => b.compareTo(a))
-        .take(2)
-        .reduce((total, inspections) => total * inspections);
+    return value;
   }
+
+  @override
+  List<Monkey> processPart2(List<Monkey> value) {
+    const rounds = 10000;
+    final commonMultiplier = value
+        .map((monkey) => monkey.testDivisibleBy)
+        .fold(1, (total, divisibleBy) => total * divisibleBy);
+
+    for (int round = 0; round < rounds; round++) {
+      for (final monkey in value) {
+        monkey.play(
+          value,
+          manageWorryLevel: (worryLevel) => worryLevel %= commonMultiplier,
+        );
+      }
+    }
+
+    return value;
+  }
+
+  @override
+  int postprocess(List<Monkey> value) => value
+      .map((monkey) => monkey.inspections)
+      .sorted((a, b) => b.compareTo(a))
+      .take(2)
+      .reduce((total, inspections) => total * inspections);
 }
 
 class Monkey {
@@ -62,7 +94,10 @@ class Monkey {
 
   int inspections;
 
-  void play(List<Monkey> monkeys) {
+  void play(
+    List<Monkey> monkeys, {
+    required int Function(int worryLevel) manageWorryLevel,
+  }) {
     for (var item in items) {
       var worryLevel = item;
 
@@ -75,7 +110,7 @@ class Monkey {
         worryLevel = left * right;
       }
 
-      worryLevel ~/= 3;
+      worryLevel = manageWorryLevel(worryLevel);
 
       final throwTo = worryLevel % testDivisibleBy == 0
           ? ifTestTrueThrowTo
@@ -88,7 +123,5 @@ class Monkey {
     items.clear();
   }
 
-  void addItem(int item) {
-    items.add(item);
-  }
+  void addItem(int item) => items.add(item);
 }
