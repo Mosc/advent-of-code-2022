@@ -3,14 +3,14 @@ import 'dart:math';
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day14 extends Day<List<String>, int> {
+class Day14 extends Day<Map<int, Map<int, Element>>, int> {
   const Day14() : super(14);
 
-  @override
-  int processPart1(List<String> input) {
-    const startingPoint = Point(500, 0);
+  static const start = Point(500, 0);
 
-    final map = <int, Map<int, Element>>{};
+  @override
+  Map<int, Map<int, Element>> preprocess(List<String> input) {
+    final grid = <int, Map<int, Element>>{};
 
     for (final line in input) {
       final rockLines = line
@@ -25,136 +25,85 @@ class Day14 extends Day<List<String>, int> {
 
         if (from.x == to.x) {
           for (int j = min(from.y, to.y); j <= max(from.y, to.y); j++) {
-            if (map[j] == null) {
-              map[j] = <int, Element>{};
-            }
-
-            map[j]![from.x] = Element.rock;
+            grid.putIfAbsent(j, () => <int, Element>{})[from.x] = Element.rock;
           }
         } else {
           for (int j = min(from.x, to.x); j <= max(from.x, to.x); j++) {
-            if (map[from.y] == null) {
-              map[from.y] = <int, Element>{};
-            }
-
-            map[from.y]![j] = Element.rock;
+            grid.putIfAbsent(from.y, () => <int, Element>{})[j] = Element.rock;
           }
         }
       }
     }
 
-    final maxY = map.keys.max;
+    return grid;
+  }
+
+  @override
+  int processPart1(Map<int, Map<int, Element>> input) {
+    final maxY = input.keys.max;
     var sandCount = 0;
     var fallingIntoAbyss = false;
 
     while (true) {
-      var sandPoint = startingPoint;
+      var sand = start;
 
       while (true) {
-        if (sandPoint.y >= maxY) {
+        if (sand.y >= maxY) {
           fallingIntoAbyss = true;
           break;
-        } else if (map[sandPoint.y + 1]?[sandPoint.x] == null) {
-          sandPoint += Point(0, 1);
-        } else if (map[sandPoint.y + 1]?[sandPoint.x - 1] == null) {
-          sandPoint += Point(-1, 1);
-        } else if (map[sandPoint.y + 1]?[sandPoint.x + 1] == null) {
-          sandPoint += Point(1, 1);
+        } else if (input[sand.y + 1]?[sand.x] == null) {
+          sand += Point(0, 1);
+        } else if (input[sand.y + 1]?[sand.x - 1] == null) {
+          sand += Point(-1, 1);
+        } else if (input[sand.y + 1]?[sand.x + 1] == null) {
+          sand += Point(1, 1);
         } else {
-          if (map[sandPoint.y] == null) {
-            map[sandPoint.y] = <int, Element>{};
-          }
-
-          map[sandPoint.y]![sandPoint.x] = Element.sand;
+          input.putIfAbsent(sand.y, () => <int, Element>{})[sand.x] =
+              Element.sand;
           break;
         }
       }
 
       if (fallingIntoAbyss) {
-        break;
+        return sandCount;
       }
 
       sandCount++;
     }
-
-    return sandCount;
   }
 
   @override
-  int processPart2(List<String> input) {
-    const startingPoint = Point(500, 0);
-
-    final map = <int, Map<int, Element>>{};
-
-    for (final line in input) {
-      final rockLines = line
-          .split(' -> ')
-          .map((point) => point.split(',').map(int.parse))
-          .map((coordinates) => Point(coordinates.first, coordinates.last))
-          .toList();
-
-      for (int i = 0; i < rockLines.length - 1; i++) {
-        final from = rockLines[i];
-        final to = rockLines[i + 1];
-
-        if (from.x == to.x) {
-          for (int j = min(from.y, to.y); j <= max(from.y, to.y); j++) {
-            if (map[j] == null) {
-              map[j] = <int, Element>{};
-            }
-
-            map[j]![from.x] = Element.rock;
-          }
-        } else {
-          for (int j = min(from.x, to.x); j <= max(from.x, to.x); j++) {
-            if (map[from.y] == null) {
-              map[from.y] = <int, Element>{};
-            }
-
-            map[from.y]![j] = Element.rock;
-          }
-        }
-      }
-    }
-
-    final maxY = map.keys.max + 1;
+  int processPart2(Map<int, Map<int, Element>> input) {
+    final maxY = input.keys.max + 1;
     var sandCount = 0;
 
     while (true) {
-      var sandPoint = startingPoint;
+      var sand = start;
 
       while (true) {
-        if (sandPoint.y >= maxY) {
-          if (map[sandPoint.y] == null) {
-            map[sandPoint.y] = <int, Element>{};
-          }
-
-          map[sandPoint.y]![sandPoint.x] = Element.sand;
+        if (sand.y >= maxY) {
+          input.putIfAbsent(sand.y, () => <int, Element>{})[sand.x] =
+              Element.sand;
           break;
-        } else if (map[sandPoint.y + 1]?[sandPoint.x] == null) {
-          sandPoint += Point(0, 1);
-        } else if (map[sandPoint.y + 1]?[sandPoint.x - 1] == null) {
-          sandPoint += Point(-1, 1);
-        } else if (map[sandPoint.y + 1]?[sandPoint.x + 1] == null) {
-          sandPoint += Point(1, 1);
+        } else if (input[sand.y + 1]?[sand.x] == null) {
+          sand += Point(0, 1);
+        } else if (input[sand.y + 1]?[sand.x - 1] == null) {
+          sand += Point(-1, 1);
+        } else if (input[sand.y + 1]?[sand.x + 1] == null) {
+          sand += Point(1, 1);
         } else {
-          if (map[sandPoint.y] == null) {
-            map[sandPoint.y] = <int, Element>{};
-          }
-
-          map[sandPoint.y]![sandPoint.x] = Element.sand;
+          input.putIfAbsent(sand.y, () => <int, Element>{})[sand.x] =
+              Element.sand;
           break;
         }
       }
 
       sandCount++;
 
-      if (sandPoint == startingPoint) {
-        break;
+      if (sand == start) {
+        return sandCount;
       }
     }
-
-    return sandCount;
   }
 }
 
