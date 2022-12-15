@@ -29,19 +29,21 @@ class Day15 extends Day<Map<Point<int>, Point<int>>, int> {
 
   @override
   int processPart1(Map<Point<int>, Point<int>> input) {
-    final beacons = input;
-    final distances = beacons.map(
-      (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
-    );
-    final minX =
-        distances.entries.map((entry) => entry.key.x - entry.value).min;
-    final maxX =
-        distances.entries.map((entry) => entry.key.x + entry.value).max;
+    final beacons = input.entries.toList();
+    final distances = input
+        .map(
+          (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
+        )
+        .entries
+        .toList();
+
+    final minX = distances.map((entry) => entry.key.x - entry.value).min;
+    final maxX = distances.map((entry) => entry.key.x + entry.value).max;
     final y = example ? 10 : 2000000;
 
     return Iterable.generate(maxX - minX + 1, (index) => minX + index)
         .where(
-          (x) => beacons.entries.any(
+          (x) => beacons.any(
             (entry) =>
                 entry.key.manhattanDistanceTo(Point(x, y)) <=
                     entry.key.manhattanDistanceTo(entry.value) &&
@@ -53,18 +55,21 @@ class Day15 extends Day<Map<Point<int>, Point<int>>, int> {
 
   @override
   int processPart2(Map<Point<int>, Point<int>> input) {
-    final distances = input.map(
-      (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
-    );
+    final distances = input
+        .map(
+          (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
+        )
+        .entries
+        .toList();
 
     const minXY = 0;
     final maxXY = example ? 20 : 4000000;
     const xMultiplier = 4000000;
 
-    for (int y = minXY; y <= maxXY; y++) {
-      for (int x = minXY; x <= maxXY; x++) {
+    for (int x = minXY; x <= maxXY; x++) {
+      for (int y = minXY; y <= maxXY; y++) {
         final point = Point(x, y);
-        final overlap = distances.entries.firstWhereOrNull(
+        final overlap = distances.firstWhereOrNull(
           (entry) => entry.key.manhattanDistanceTo(point) <= entry.value,
         );
 
@@ -72,7 +77,7 @@ class Day15 extends Day<Map<Point<int>, Point<int>>, int> {
           return x * xMultiplier + y;
         }
 
-        x = overlap.key.x + overlap.value - (overlap.key.y - y).abs();
+        y = overlap.key.y + overlap.value - (overlap.key.x - x).abs();
       }
     }
 

@@ -73,17 +73,13 @@ class Day12 extends Day<List<String>, int> {
         goal: goal,
         costTo: (a, b) => 1,
         neighborsOf: (current) => [
-          Point(current.x, current.y - 1),
-          Point(current.x, current.y + 1),
-          Point(current.x - 1, current.y),
-          Point(current.x + 1, current.y),
+          if (current.y > 0) Point(current.x, current.y - 1),
+          if (current.y < grid.length - 1) Point(current.x, current.y + 1),
+          if (current.x > 0) Point(current.x - 1, current.y),
+          if (current.x < grid[current.y].length - 1)
+            Point(current.x + 1, current.y),
         ].where(
-          (point) =>
-              point.y >= 0 &&
-              point.y < grid.length &&
-              point.x >= 0 &&
-              point.x < grid[point.y].length &&
-              grid[point.y][point.x] - grid[current.y][current.x] <= 1,
+          (point) => grid[point.y][point.x] - grid[current.y][current.x] <= 1,
         ),
       )?.toInt();
 
@@ -95,7 +91,6 @@ class Day12 extends Day<List<String>, int> {
     required Iterable<L> Function(L) neighborsOf,
   }) {
     final dist = <L, double>{start: 0};
-    final prev = <L, L>{};
     final queue = PriorityQueue<L>(
       (L a, L b) =>
           (dist[a] ?? double.infinity).compareTo(dist[b] ?? double.infinity),
@@ -113,7 +108,6 @@ class Day12 extends Day<List<String>, int> {
 
         if (score < (dist[neighbor] ?? double.infinity)) {
           dist[neighbor] = score;
-          prev[neighbor] = current;
           queue.add(neighbor);
         }
       }
