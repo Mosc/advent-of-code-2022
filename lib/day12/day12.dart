@@ -30,26 +30,62 @@ class Day12 extends Day<List<String>, int> {
       );
     }
 
-    return _dijkstraLowestCost(
-      start: start,
-      goal: goal,
-      costTo: (a, b) => 1,
-      neighborsOf: (current) => [
-        Point(current.x, current.y - 1),
-        Point(current.x, current.y + 1),
-        Point(current.x - 1, current.y),
-        Point(current.x + 1, current.y),
-      ].where(
-        (point) =>
-            point.y >= 0 &&
-            point.y < grid.length &&
-            point.x >= 0 &&
-            point.x < grid[point.y].length &&
-            grid[point.y][point.x] - grid[current.y][current.x] <= 1,
-      ),
-    )!
-        .toInt();
+    return _fewestSteps(start, goal, grid)!;
   }
+
+  @override
+  int processPart2(List<String> input) {
+    final grid = <List<int>>[];
+    final possibleStarts = <Point<int>>[];
+    late Point<int> goal;
+
+    for (final line in input) {
+      grid.add(
+        line.codeUnits.mapIndexed((index, codeUnit) {
+          final point = Point(index, grid.length);
+
+          if (codeUnit == 'S'.codeUnits.single) {
+            possibleStarts.add(point);
+            return 'a'.codeUnits.single;
+          } else if (codeUnit == 'E'.codeUnits.single) {
+            goal = point;
+            return 'z'.codeUnits.single;
+          } else {
+            if (codeUnit == 'a'.codeUnits.single) {
+              possibleStarts.add(point);
+            }
+
+            return codeUnit;
+          }
+        }).toList(),
+      );
+    }
+
+    return possibleStarts
+        .map((start) => _fewestSteps(start, goal, grid))
+        .whereType<int>()
+        .min;
+  }
+
+  int? _fewestSteps(Point<int> start, Point<int> goal, List<List<int>> grid) =>
+      _dijkstraLowestCost(
+        start: start,
+        goal: goal,
+        costTo: (a, b) => 1,
+        neighborsOf: (current) => [
+          Point(current.x, current.y - 1),
+          Point(current.x, current.y + 1),
+          Point(current.x - 1, current.y),
+          Point(current.x + 1, current.y),
+        ].where(
+          (point) =>
+              point.y >= 0 &&
+              point.y < grid.length &&
+              point.x >= 0 &&
+              point.x < grid[point.y].length &&
+              grid[point.y][point.x] - grid[current.y][current.x] <= 1,
+        ),
+      )?.toInt();
 
   // Based on https://github.com/darrenaustin/advent-of-code-dart/blob/main/lib/src/util/pathfinding.dart.
   double? _dijkstraLowestCost<L>({
