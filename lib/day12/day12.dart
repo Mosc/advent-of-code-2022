@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:advent_of_code_2022/day.dart';
+import 'package:advent_of_code_2022/utils/pathfinding.dart';
 import 'package:collection/collection.dart';
 
 class Day12 extends Day<List<String>, int> {
@@ -63,12 +64,12 @@ class Day12 extends Day<List<String>, int> {
 
     return possibleStarts
         .map((start) => _fewestSteps(start, goal, grid))
-        .whereType<int>()
+        .whereNotNull()
         .min;
   }
 
   int? _fewestSteps(Point<int> start, Point<int> goal, List<List<int>> grid) =>
-      _dijkstraLowestCost(
+      dijkstraLowestCost(
         start: start,
         goal: goal,
         costTo: (a, b) => 1,
@@ -82,37 +83,4 @@ class Day12 extends Day<List<String>, int> {
           (point) => grid[point.y][point.x] - grid[current.y][current.x] <= 1,
         ),
       )?.toInt();
-
-  // Based on https://github.com/darrenaustin/advent-of-code-dart/blob/main/lib/src/util/pathfinding.dart.
-  double? _dijkstraLowestCost<L>({
-    required L start,
-    required L goal,
-    required double Function(L, L) costTo,
-    required Iterable<L> Function(L) neighborsOf,
-  }) {
-    final dist = <L, double>{start: 0};
-    final queue = PriorityQueue<L>(
-      (L a, L b) =>
-          (dist[a] ?? double.infinity).compareTo(dist[b] ?? double.infinity),
-    )..add(start);
-
-    while (queue.isNotEmpty) {
-      var current = queue.removeFirst();
-
-      if (current == goal) {
-        return dist[goal];
-      }
-
-      for (final neighbor in neighborsOf(current)) {
-        final score = dist[current]! + costTo(current, neighbor);
-
-        if (score < (dist[neighbor] ?? double.infinity)) {
-          dist[neighbor] = score;
-          queue.add(neighbor);
-        }
-      }
-    }
-
-    return null;
-  }
 }
