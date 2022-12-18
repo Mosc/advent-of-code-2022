@@ -7,6 +7,7 @@ import 'package:advent_of_code_2022/day13/day13.dart';
 import 'package:advent_of_code_2022/day14/day14.dart';
 import 'package:advent_of_code_2022/day15/day15.dart';
 import 'package:advent_of_code_2022/day16/day16.dart';
+import 'package:advent_of_code_2022/day18/day18.dart';
 import 'package:advent_of_code_2022/day2/day2.dart';
 import 'package:advent_of_code_2022/day3/day3.dart';
 import 'package:advent_of_code_2022/day4/day4.dart';
@@ -15,6 +16,8 @@ import 'package:advent_of_code_2022/day6/day6.dart';
 import 'package:advent_of_code_2022/day7/day7.dart';
 import 'package:advent_of_code_2022/day8/day8.dart';
 import 'package:advent_of_code_2022/day9/day9.dart';
+
+const filter = [18];
 
 const _days = <Day>[
   Day1(),
@@ -33,10 +36,13 @@ const _days = <Day>[
   Day14(),
   Day15(),
   Day16(),
+  Day18(),
 ];
 
 Future<void> main() async {
   for (var day in _days) {
-    await day.calculate();
+    if (filter.isNotEmpty && filter.contains(day.number)) {
+      await day.calculate();
+    }
   }
 }
