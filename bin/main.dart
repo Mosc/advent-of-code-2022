@@ -17,7 +17,7 @@ import 'package:advent_of_code_2022/day7/day7.dart';
 import 'package:advent_of_code_2022/day8/day8.dart';
 import 'package:advent_of_code_2022/day9/day9.dart';
 
-const filter = [18];
+const filter = [];
 
 const _days = <Day>[
   Day1(),
@@ -41,7 +41,7 @@ const _days = <Day>[
 
 Future<void> main() async {
   for (var day in _days) {
-    if (filter.isNotEmpty && filter.contains(day.number)) {
+    if (filter.isEmpty || filter.contains(day.number)) {
       await day.calculate();
     }
   }
