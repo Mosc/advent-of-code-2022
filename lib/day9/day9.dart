@@ -17,7 +17,11 @@ class Day9 extends Day<List<String>, Set<Point<int>>> {
   int postprocess(Set<Point<int>> input) => input.length;
 
   Set<Point<int>> _getVisited(List<String> value, {required int length}) {
-    final knots = List<Point<int>>.generate(length, (_) => const Point(0, 0));
+    final knots = List<Point<int>>.generate(
+      length,
+      (_) => const Point(0, 0),
+      growable: false,
+    );
     final visitedTailPos = <Point<int>>{knots.last};
 
     for (final line in value) {

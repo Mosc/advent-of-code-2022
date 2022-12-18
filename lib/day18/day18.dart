@@ -8,7 +8,7 @@ class Day18 extends Day<Set<Cube>, int> {
 
   @override
   Set<Cube> preprocess(List<String> input) => input
-      .map((line) => line.split(',').map(int.parse).toList())
+      .map((line) => line.split(',').map(int.parse).toList(growable: false))
       .map((dimensions) => Cube(dimensions[0], dimensions[1], dimensions[2]))
       .toSet();
 

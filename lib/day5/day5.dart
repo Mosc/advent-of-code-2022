@@ -53,9 +53,10 @@ class Day5 extends Day<Procedure, Iterable<Queue<String>>> {
   @override
   Iterable<Queue<String>> processPart2(Procedure input) {
     for (final rearrangement in input.rearrangements) {
-      final crates = input.stacks[rearrangement.from]!.toList().sublist(
-            input.stacks[rearrangement.from]!.length - rearrangement.amount,
-          );
+      final crates =
+          input.stacks[rearrangement.from]!.toList(growable: false).sublist(
+                input.stacks[rearrangement.from]!.length - rearrangement.amount,
+              );
 
       for (final crate in crates) {
         input.stacks[rearrangement.from]!.removeLast();

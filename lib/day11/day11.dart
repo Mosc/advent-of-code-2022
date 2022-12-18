@@ -27,10 +27,13 @@ class Day11 extends Day<List<Monkey>, List<Monkey>> {
           .skip(i)
           .take(6)
           .map((line) => line.split(':').last.trim())
-          .toList();
+          .toList(growable: false);
       final startingItems = monkeyLines[1].split(', ').map(int.parse).toList();
-      final operationParts =
-          monkeyLines[2].split('=')[1].trim().split(' ').toList();
+      final operationParts = monkeyLines[2]
+          .split('=')[1]
+          .trim()
+          .split(' ')
+          .toList(growable: false);
       final operator = parseOperator(operationParts[1]);
       final operationLeft = parseOperationPart(operationParts[0]);
       final operationRight = parseOperationPart(operationParts[2]);

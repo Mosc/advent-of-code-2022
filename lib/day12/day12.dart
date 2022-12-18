@@ -27,7 +27,7 @@ class Day12 extends Day<List<String>, int> {
           } else {
             return codeUnit;
           }
-        }).toList(),
+        }).toList(growable: false),
       );
     }
 
@@ -58,7 +58,7 @@ class Day12 extends Day<List<String>, int> {
 
             return codeUnit;
           }
-        }).toList(),
+        }).toList(growable: false),
       );
     }
 

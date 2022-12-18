@@ -10,7 +10,8 @@ class Day4
           final split = sections.split('-').map(int.parse);
           final from = split.first;
           final to = split.last;
-          return List.generate(to - from + 1, (index) => from + index).toSet();
+          return Iterable.generate(to - from + 1, (index) => from + index)
+              .toSet();
         }),
       );
 

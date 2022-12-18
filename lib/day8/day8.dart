@@ -55,7 +55,7 @@ class Day8 extends Day<List<List<Tree>>, int> {
         final currentTree = currentRow[j];
 
         final left = currentTree.calculateViewingDistance(
-          currentRow.sublist(0, j).reversed.toList(),
+          currentRow.sublist(0, j).reversed.toList(growable: false),
           orElse: () => j,
         );
         final right = currentTree.calculateViewingDistance(
@@ -63,7 +63,7 @@ class Day8 extends Day<List<List<Tree>>, int> {
           orElse: () => currentRow.length - j - 1,
         );
         final up = currentTree.calculateViewingDistance(
-          currentColumn.sublist(0, i).reversed.toList(),
+          currentColumn.sublist(0, i).reversed.toList(growable: false),
           orElse: () => i,
         );
         final down = currentTree.calculateViewingDistance(

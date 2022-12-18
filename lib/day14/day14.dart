@@ -17,7 +17,7 @@ class Day14 extends Day<Map<int, Map<int, Element>>, int> {
           .split(' -> ')
           .map((point) => point.split(',').map(int.parse))
           .map((coordinates) => Point(coordinates.first, coordinates.last))
-          .toList();
+          .toList(growable: false);
 
       for (int i = 0; i < rockLines.length - 1; i++) {
         final from = rockLines[i];

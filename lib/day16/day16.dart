@@ -17,7 +17,7 @@ class Day16 extends Day<List<String>, int> {
     final start = valveMap['AA']!;
     final relevantValves = valveMap.values
         .where((valve) => valve == start || valve.rate > 0)
-        .toList();
+        .toList(growable: false);
 
     for (final valve1 in relevantValves) {
       valve1.neighbors = Map<Valve, int>.fromEntries(

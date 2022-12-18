@@ -29,13 +29,13 @@ class Day15 extends Day<Map<Point<int>, Point<int>>, int> {
 
   @override
   int processPart1(Map<Point<int>, Point<int>> input) {
-    final beacons = input.entries.toList();
+    final beacons = input.entries.toList(growable: false);
     final distances = input
         .map(
           (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
         )
         .entries
-        .toList();
+        .toList(growable: false);
 
     final minX = distances.map((entry) => entry.key.x - entry.value).min;
     final maxX = distances.map((entry) => entry.key.x + entry.value).max;
@@ -60,7 +60,7 @@ class Day15 extends Day<Map<Point<int>, Point<int>>, int> {
           (key, value) => MapEntry(key, key.manhattanDistanceTo(value)),
         )
         .entries
-        .toList();
+        .toList(growable: false);
 
     const minXY = 0;
     final maxXY = example ? 20 : 4000000;
