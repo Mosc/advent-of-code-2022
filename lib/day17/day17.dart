@@ -31,22 +31,22 @@ class Day17 extends Day<List<Direction>, int> {
     final cache = <String, List<int>>{};
     final grid = <List<bool>>[];
     var jetIndex = 0;
-    var skipped = 0;
+    int? skippedHeight;
 
     for (var rockIndex = 0; rockIndex < totalRocks; rockIndex++) {
       final rock = Rock.create(number: rockIndex, gridHeight: grid.length);
       var stopped = false;
 
-      if (grid.isNotEmpty && skipped == 0) {
+      if (grid.isNotEmpty && skippedHeight == null) {
         final cacheKey = '${rock.shapeIndex}-$jetIndex-${grid.last.render()}';
         final cacheValue = cache[cacheKey];
 
         if (cacheValue != null) {
           int rockPeriod = rockIndex - cacheValue.first;
           int height = grid.length - cacheValue.last;
-          final skipCycles = (totalRocks - rockIndex) ~/ rockPeriod;
-          rockIndex += skipCycles * rockPeriod;
-          skipped += skipCycles * height;
+          final skippedCycles = (totalRocks - rockIndex) ~/ rockPeriod;
+          rockIndex += skippedCycles * rockPeriod;
+          skippedHeight = skippedCycles * height;
         } else {
           cache[cacheKey] = [rockIndex, grid.length];
         }
@@ -91,7 +91,7 @@ class Day17 extends Day<List<Direction>, int> {
       }
     }
 
-    return grid.length + skipped;
+    return grid.length + (skippedHeight ?? 0);
   }
 }
 

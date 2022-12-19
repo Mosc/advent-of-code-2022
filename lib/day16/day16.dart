@@ -73,7 +73,7 @@ class Valve {
     final pressure = rate * timeRemaining;
 
     if (timeRemaining > 0 && relevantValves.isNotEmpty) {
-      for (var valve in relevantValves) {
+      for (final valve in relevantValves) {
         yield* valve.getPressureCandidates(
           opened: [...opened, MapEntry(this, pressure)],
           timeRemaining: timeRemaining - neighbors[valve]! - 1,
