@@ -42,7 +42,7 @@ class Day16 extends Day<List<String>, int> {
 
     return start
         .getPressureCandidates(timeRemaining: 30)
-        .map((opened) => opened.map((pressure) => pressure.value).sum)
+        .map((pressures) => pressures.sum)
         .max;
   }
 }
@@ -63,8 +63,8 @@ class Valve {
   final Set<String> leadsTo;
   late Map<Valve, int> neighbors;
 
-  Iterable<Iterable<MapEntry<Valve, int>>> getPressureCandidates({
-    Iterable<MapEntry<Valve, int>> opened = const [],
+  Iterable<List<int>> getPressureCandidates({
+    List<MapEntry<Valve, int>> opened = const [],
     required int timeRemaining,
   }) sync* {
     final relevantValves = neighbors.keys.where(
@@ -80,7 +80,7 @@ class Valve {
         );
       }
     } else {
-      yield [...opened, MapEntry(this, pressure)];
+      yield [...opened.map((valve) => valve.value), pressure];
     }
   }
 
