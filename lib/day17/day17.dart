@@ -12,7 +12,7 @@ const shapes = [
 ];
 
 class Day17 extends Day<List<Direction>, int> {
-  const Day17() : super(17, example: true);
+  const Day17() : super(17);
 
   @override
   List<Direction> preprocess(List<String> input) => input.single
@@ -21,19 +21,39 @@ class Day17 extends Day<List<Direction>, int> {
       .toList(growable: false);
 
   @override
-  int processPart1(List<Direction> input) {
-    const chamberWidth = 7;
-    const rockTotal = 2022;
+  int processPart1(List<Direction> input) => dropRocks(input, 2022);
 
+  @override
+  int processPart2(List<Direction> input) => dropRocks(input, 1000000000000);
+
+  int dropRocks(List<Direction> input, int totalRocks) {
+    const chamberWidth = 7;
+    final cache = <String, List<int>>{};
     final grid = <List<bool>>[];
     var jetIndex = 0;
+    var skipped = 0;
 
-    for (var rockIndex = 0; rockIndex < rockTotal; rockIndex++) {
+    for (var rockIndex = 0; rockIndex < totalRocks; rockIndex++) {
       final rock = Rock.create(number: rockIndex, gridHeight: grid.length);
       var stopped = false;
 
+      if (grid.isNotEmpty && skipped == 0) {
+        final cacheKey = '${rock.shapeIndex}-$jetIndex-${grid.last.render()}';
+        final cacheValue = cache[cacheKey];
+
+        if (cacheValue != null) {
+          int rockPeriod = rockIndex - cacheValue.first;
+          int height = grid.length - cacheValue.last;
+          final skipCycles = (totalRocks - rockIndex) ~/ rockPeriod;
+          rockIndex += skipCycles * rockPeriod;
+          skipped += skipCycles * height;
+        } else {
+          cache[cacheKey] = [rockIndex, grid.length];
+        }
+      }
+
       while (!stopped) {
-        final jet = input[jetIndex++ % input.length];
+        final jet = input[jetIndex];
 
         for (final direction in [jet, Direction.down]) {
           final tentativePosition = rock.position + direction.offset;
@@ -56,6 +76,8 @@ class Day17 extends Day<List<Direction>, int> {
             stopped = true;
           }
         }
+
+        jetIndex = ++jetIndex % input.length;
       }
 
       final partPositions = rock.shape.map((part) => rock.position + part);
@@ -69,17 +91,23 @@ class Day17 extends Day<List<Direction>, int> {
       }
     }
 
-    return grid.length;
+    return grid.length + skipped;
   }
+}
+
+extension GridRowExtension on List<bool> {
+  String render() => map((filled) => filled ? '#' : '.').join();
 }
 
 class Rock {
   Rock.create({required int number, int gridHeight = 0})
-      : shape = shapes[number % shapes.length],
+      : shapeIndex = number % shapes.length,
         position = Point(2, gridHeight + 3);
 
-  final List<Point<int>> shape;
+  final int shapeIndex;
   Point<int> position;
+
+  late List<Point<int>> shape = shapes[shapeIndex];
 }
 
 enum Direction {
