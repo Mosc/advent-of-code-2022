@@ -37,7 +37,7 @@ class Day18 extends Day<Set<Cube>, int> {
         cube.z >= minZ &&
         cube.z <= maxZ;
 
-    final queue = Queue<Cube>()..add(Cube(minX, minY, minZ));
+    final queue = Queue<Cube>.from([Cube(minX, minY, minZ)]);
     final water = <Cube>{};
     var surfaceArea = 0;
 
