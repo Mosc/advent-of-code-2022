@@ -16,15 +16,8 @@ class Day3 extends Day<List<String>, Iterable<Iterable<Set<String>>>> {
 
   @override
   Iterable<Iterable<Set<String>>> processPart2(List<String> input) => input
-      .asMap()
-      .entries
-      .groupListsBy((indexedLine) => indexedLine.key ~/ 3)
-      .values
-      .map(
-        (indexedGroup) => indexedGroup.map(
-          (indexedLine) => indexedLine.value.split('').toSet(),
-        ),
-      );
+      .slices(3)
+      .map((slice) => slice.map((part) => part.split('').toSet()));
 
   @override
   int postprocess(Iterable<Iterable<Set<String>>> input) => input.map(
