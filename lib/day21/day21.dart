@@ -1,11 +1,13 @@
 import 'package:advent_of_code_2022/day.dart';
 
-class Day21 extends Day<List<String>, int> {
+class Day21 extends Day<Map<String, Monkey>, int> {
   const Day21() : super(21);
 
+  static const rootName = 'root';
+  static const humanName = 'humn';
+
   @override
-  int processPart1(List<String> input) {
-    const rootName = 'root';
+  Map<String, Monkey> preprocess(List<String> input) {
     final monkeys = <String, Monkey>{};
 
     for (final line in input) {
@@ -13,18 +15,71 @@ class Day21 extends Day<List<String>, int> {
       monkeys[tokens[0]] = Monkey.parse(name: tokens[0], job: tokens[1]);
     }
 
+    return monkeys;
+  }
+
+  @override
+  int processPart1(Map<String, Monkey> input) {
+    final monkeys = input;
+
     while (monkeys[rootName] is! NumberMonkey) {
-      for (final monkey in monkeys.values.whereType<MathMonkey>()) {
-        if (monkey.canSolve(monkeys)) {
-          monkeys[monkey.name] = NumberMonkey(
-            name: monkey.name,
-            number: monkey.solve(monkeys),
+      for (final mathMonkey in monkeys.values.whereType<MathMonkey>()) {
+        if (mathMonkey.canSolve(monkeys)) {
+          monkeys[mathMonkey.name] = NumberMonkey(
+            name: mathMonkey.name,
+            number: mathMonkey.solve(monkeys),
           );
         }
       }
     }
 
     return (monkeys[rootName] as NumberMonkey).number;
+  }
+
+  @override
+  int processPart2(Map<String, Monkey> input) {
+    final rootMonkey = input[rootName] as MathMonkey;
+    input[rootName] = MathMonkey(
+      name: rootName,
+      left: rootMonkey.left,
+      operator: Operator.equals,
+      right: rootMonkey.right,
+    );
+
+    var minHumanNumber = 0;
+    var maxHumanNumber = 1 << 48;
+    var humanNumber = minHumanNumber;
+
+    while (true) {
+      final monkeys = Map<String, Monkey>.from(input);
+      monkeys[humanName] = NumberMonkey(name: humanName, number: humanNumber);
+
+      while (monkeys[rootName] is! NumberMonkey) {
+        for (final mathMonkey in monkeys.values.whereType<MathMonkey>()) {
+          if (mathMonkey.canSolve(monkeys)) {
+            final numberMonkey = NumberMonkey(
+              name: mathMonkey.name,
+              number: mathMonkey.solve(monkeys),
+            );
+            monkeys[mathMonkey.name] = numberMonkey;
+
+            if (mathMonkey.name == rootName) {
+              // Note: We're making an assumption here that "humn" is part of the right side of the
+              // tree. That works on our input, but breaks on the example and possibly other inputs.
+              if (numberMonkey.number > 0) {
+                minHumanNumber = humanNumber;
+              } else if (numberMonkey.number < 0) {
+                maxHumanNumber = humanNumber;
+              } else {
+                return humanNumber;
+              }
+
+              humanNumber = (maxHumanNumber + minHumanNumber) ~/ 2;
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -86,7 +141,8 @@ enum Operator {
   add,
   subtract,
   multiply,
-  divide;
+  divide,
+  equals;
 
   const Operator();
 
@@ -115,6 +171,8 @@ enum Operator {
         return left - right;
       case Operator.divide:
         return left ~/ right;
+      case Operator.equals:
+        return left.compareTo(right);
     }
   }
 }
