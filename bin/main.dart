@@ -12,6 +12,7 @@ import 'package:advent_of_code_2022/day18/day18.dart';
 import 'package:advent_of_code_2022/day19/day19.dart';
 import 'package:advent_of_code_2022/day2/day2.dart';
 import 'package:advent_of_code_2022/day20/day20.dart';
+import 'package:advent_of_code_2022/day21/day21.dart';
 import 'package:advent_of_code_2022/day3/day3.dart';
 import 'package:advent_of_code_2022/day4/day4.dart';
 import 'package:advent_of_code_2022/day5/day5.dart';
@@ -43,6 +44,7 @@ const _days = <Day>[
   Day18(),
   Day19(),
   Day20(),
+  Day21(),
 ];
 
 Future<void> main() async {
