@@ -1,45 +1,47 @@
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day19 extends Day<List<String>, int> {
+class Day19 extends Day<Iterable<Blueprint>, int> {
   const Day19() : super(19);
 
   @override
-  int processPart1(List<String> input) {
-    final blueprints = <Blueprint>[];
+  Iterable<Blueprint> preprocess(List<String> input) => input.map((line) {
+        final id =
+            int.parse(RegExp(r'Blueprint (\d+)').firstMatch(line)!.group(1)!);
+        final matches =
+            RegExp(r'Each (\w+) robot costs (\d+) (\w+)(?: and (\d+) (\w+))*.')
+                .allMatches(line);
 
-    for (final line in input) {
-      final id =
-          int.parse(RegExp(r'Blueprint (\d+)').firstMatch(line)!.group(1)!);
-      final matches =
-          RegExp(r'Each (\w+) robot costs (\d+) (\w+)(?: and (\d+) (\w+))*.')
-              .allMatches(line);
+        final costs = <Resource, Map<Resource, int>>{};
 
-      final costs = <Resource, Map<Resource, int>>{};
+        for (final match in matches) {
+          final resource = Resource.parse(match[1]!);
+          final cost = {
+            for (int i = 2; i < match.groupCount; i += 2)
+              if (match[i] != null && match[i + 1] != null)
+                Resource.parse(match[i + 1]!): int.parse(match[i]!),
+          };
+          costs[resource] = cost;
+        }
 
-      for (final match in matches) {
-        final resource = Resource.parse(match[1]!);
-        final cost = {
-          for (int i = 2; i < match.groupCount; i += 2)
-            if (match[i] != null && match[i + 1] != null)
-              Resource.parse(match[i + 1]!): int.parse(match[i]!),
-        };
-        costs[resource] = cost;
-      }
+        return Blueprint(id: id, costs: costs);
+      });
 
-      blueprints.add(Blueprint(id: id, costs: costs));
-    }
+  @override
+  int processPart1(Iterable<Blueprint> input) => input
+      .map(
+        (blueprint) =>
+            blueprint.id * _getHighestGeodes(blueprint, timeRemaining: 24),
+      )
+      .sum;
 
-    return blueprints
-        .map(
-          (blueprint) =>
-              blueprint.id * _getHighestGeodes(blueprint, timeRemaining: 24),
-        )
-        .sum;
-  }
+  @override
+  int processPart2(Iterable<Blueprint> input) => input
+      .take(3)
+      .map((blueprint) => _getHighestGeodes(blueprint, timeRemaining: 32))
+      .reduce((previous, current) => previous * current);
 
   int _getHighestGeodes(Blueprint blueprint, {required int timeRemaining}) {
     final queue = Queue<State>.from([State(timeRemaining: timeRemaining)]);
@@ -85,11 +87,16 @@ class Day19 extends Day<List<String>, int> {
             continue;
           }
 
-          queue.add(state.buildRobot(costEntry.key, cost: costEntry.value));
-
-          if (costEntry.key == Resource.geode) {
-            break;
+          if (buildableRobots.contains(Resource.geode) &&
+              costEntry.key != Resource.geode) {
+            continue;
           }
+
+          queue.add(state.buildRobot(costEntry.key, cost: costEntry.value));
+        }
+
+        if (buildableRobots.contains(Resource.geode)) {
+          continue;
         }
 
         queue.add(state.idle(skipRobots: buildableRobots));
@@ -97,7 +104,7 @@ class Day19 extends Day<List<String>, int> {
         final geodes = state.resources[Resource.geode]!;
 
         if (geodes > highestGeodes) {
-          highestGeodes = max(highestGeodes, geodes);
+          highestGeodes = geodes;
         }
       }
     }
@@ -144,15 +151,18 @@ class State {
         (key) => resources[key]! >= cost[key]!,
       );
 
-  State buildRobot(Resource resource, {required Map<Resource, int> cost}) =>
+  State buildRobot(Resource robot, {required Map<Resource, int> cost}) =>
       State._(
         robots: robots.map(
-          (key, value) => MapEntry(key, value + (key == resource ? 1 : 0)),
+          (key, value) => MapEntry(key, value + (key == robot ? 1 : 0)),
         ),
         resources: resources.map(
           (key, value) =>
               MapEntry(key, value + robots[key]! - (cost[key] ?? 0)),
         ),
+        skipRobots: Resource.values
+            .where((resource) => resource.index < robot.index - 1)
+            .toSet(),
         timeRemaining: timeRemaining - 1,
       );
 
