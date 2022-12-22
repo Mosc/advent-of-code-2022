@@ -8,19 +8,19 @@ class Day22 extends Day<List<String>, int> {
 
   @override
   int processPart1(List<String> input) {
-    final mapEndIndex = input.indexOf('');
-    final maxWidth = input.take(mapEndIndex).map((e) => e.length).max;
+    final gridHeight = input.indexOf('');
+    final gridWidth = input.take(gridHeight).map((e) => e.length).max;
     final grid = input
-        .take(mapEndIndex)
+        .take(gridHeight)
         .map(
           (line) => line
-              .padRight(maxWidth)
+              .padRight(gridWidth)
               .split('')
               .map((character) => Tile.parse(character))
               .toList(),
         )
         .toList();
-    final directionsLine = input.skip(mapEndIndex + 1).first;
+    final directionsLine = input.skip(gridHeight + 1).first;
     final directions = RegExp(r'\d+|L|R')
         .allMatches(directionsLine)
         .map((match) => match.group(0)!);
@@ -67,22 +67,19 @@ class Day22 extends Day<List<String>, int> {
 }
 
 enum Tile {
-  none,
-  open,
-  solid;
+  none(' '),
+  open('.'),
+  solid('#');
 
-  static Tile parse(String character) {
-    switch (character) {
-      case '.':
-        return Tile.open;
-      case '#':
-        return Tile.solid;
-      case ' ':
-        return Tile.none;
-    }
+  const Tile(this.character);
 
-    throw Exception();
-  }
+  final String character;
+
+  static Tile parse(String character) =>
+      Tile.values.singleWhere((tile) => tile.character == character);
+
+  @override
+  String toString() => character;
 }
 
 class State {
@@ -120,29 +117,24 @@ class State {
 }
 
 enum Orientation {
-  right,
-  down,
-  left,
-  top;
+  right('>', Point(1, 0)),
+  down('v', Point(0, 1)),
+  left('<', Point(-1, 0)),
+  top('^', Point(0, -1));
 
-  Point<int> get step {
-    switch (this) {
-      case Orientation.right:
-        return Point(1, 0);
-      case Orientation.down:
-        return Point(0, 1);
-      case Orientation.left:
-        return Point(-1, 0);
-      case Orientation.top:
-        return Point(0, -1);
-    }
-  }
+  const Orientation(this.character, this.step);
+
+  final String character;
+  final Point<int> step;
 
   Orientation get turnLeft =>
       Orientation.values[(index - 1) % Orientation.values.length];
 
   Orientation get turnRight =>
       Orientation.values[(index + 1) % Orientation.values.length];
+
+  @override
+  String toString() => character;
 }
 
 class HitWallException implements Exception {}
