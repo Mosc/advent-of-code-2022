@@ -3,17 +3,19 @@ import 'dart:math';
 import 'package:advent_of_code_2022/day.dart';
 import 'package:collection/collection.dart';
 
-class Day23 extends Day<List<Elf>, int> {
+typedef Elf = Point<int>;
+
+class Day23 extends Day<Set<Elf>, int> {
   const Day23() : super(23);
 
   @override
-  List<Elf> preprocess(List<String> input) {
-    final elves = <Elf>[];
+  Set<Elf> preprocess(List<String> input) {
+    final elves = <Elf>{};
 
     for (var y = 0; y < input.length; y++) {
       for (var x = 0; x < input[y].length; x++) {
         if (input[y].split('')[x] == '#') {
-          elves.add(Elf(Point(x, y)));
+          elves.add(Point(x, y));
         }
       }
     }
@@ -22,21 +24,20 @@ class Day23 extends Day<List<Elf>, int> {
   }
 
   @override
-  int processPart1(List<Elf> input) {
+  int processPart1(Set<Elf> input) {
     for (var i = 0; i < 10; i++) {
       _runRound(input, i);
     }
 
-    final positions = input.map((elf) => elf.position).toSet();
-    final positionsX = positions.map((position) => position.x).toSet();
-    final positionsY = positions.map((position) => position.y).toSet();
+    final positionsX = input.map((position) => position.x).toSet();
+    final positionsY = input.map((position) => position.y).toSet();
     final lengthX = positionsX.max - positionsX.min + 1;
     final lengthY = positionsY.max - positionsY.min + 1;
     return lengthX * lengthY - input.length;
   }
 
   @override
-  int processPart2(List<Elf> input) {
+  int processPart2(Set<Elf> input) {
     int i;
     var done = false;
 
@@ -47,67 +48,50 @@ class Day23 extends Day<List<Elf>, int> {
     return i;
   }
 
-  bool _runRound(List<Elf> elves, int i) {
+  bool _runRound(Set<Elf> elves, int round) {
+    final proposedMoves = <Elf, Elf>{};
+
     for (final elf in elves) {
-      final direction = elf.findMoveDirection(i, elves);
+      final direction = _getDirection(elf, elves, round: round);
 
       if (direction != null) {
-        elf.proposeMove(direction);
-      } else {
-        elf.clearProposedMove();
+        var position = elf + direction.offsets[1];
+
+        if (!proposedMoves.containsKey(position)) {
+          proposedMoves[position] = elf;
+        } else {
+          proposedMoves.remove(position);
+        }
       }
     }
 
-    for (final elf in elves) {
-      if (elf.shouldMove(elves)) {
-        elf.move();
-      }
+    for (final proposedMove in proposedMoves.entries) {
+      elves
+        ..remove(proposedMove.value)
+        ..add(proposedMove.key);
     }
 
-    return elves.every((elf) => elf.proposedPosition == null);
+    return proposedMoves.isEmpty;
   }
-}
 
-class Elf {
-  Elf(this.position);
+  Direction? _getDirection(Elf elf, Set<Elf> elves, {required int round}) {
+    if (!canMove(elf, elves, allOffsets)) {
+      for (int i = 0; i < Direction.values.length; i++) {
+        final direction =
+            Direction.values[(round + i) % Direction.values.length];
 
-  Point<int> position;
-  Point<int>? proposedPosition;
-
-  Direction? findMoveDirection(int round, List<Elf> elves) {
-    bool canMove(Iterable<Point<int>> offsets) =>
-        !offsets.map((offset) => position + offset).any(
-              (adjacent) => elves.map((elf) => elf.position).contains(adjacent),
-            );
-
-    for (int i = 0; i < Direction.values.length; i++) {
-      final direction = Direction.values[(round + i) % Direction.values.length];
-
-      if (canMove(direction.offsets) &&
-          !canMove(
-            allOffsets.whereNot((offset) => direction.offsets.contains(offset)),
-          )) {
-        return direction;
+        if (canMove(elf, elves, direction.offsets)) {
+          return direction;
+        }
       }
     }
 
     return null;
   }
 
-  void proposeMove(Direction direction) =>
-      proposedPosition = position + direction.offsets[1];
-
-  bool shouldMove(List<Elf> elves) =>
-      proposedPosition != null &&
-      !elves
-          .whereNot((elf) => elf.position == position)
-          .map((elf) => elf.proposedPosition)
-          .whereNotNull()
-          .contains(proposedPosition);
-
-  void move() => position = proposedPosition!;
-
-  void clearProposedMove() => proposedPosition = null;
+  bool canMove(Elf elf, Set<Elf> elves, Iterable<Point<int>> offsets) => offsets
+      .map((offset) => elf + offset)
+      .every((adjacent) => !elves.contains(adjacent));
 }
 
 enum Direction {
