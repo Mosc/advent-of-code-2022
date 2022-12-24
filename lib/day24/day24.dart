@@ -2,26 +2,27 @@ import 'dart:math';
 
 import 'package:advent_of_code_2022/day.dart';
 
-class Day24 extends Day<List<String>, int> {
+class Day24 extends Day<Expedition, int> {
   const Day24() : super(24);
 
   @override
-  int processPart1(List<String> input) {
+  Expedition preprocess(List<String> input) {
     final blizzards = <Blizzard>{};
-    final walls = <Point<int>>{};
     final start = Point(input.first.indexOf('.'), 0);
-    final goal = Point(input.last.indexOf('.'), input.length);
+    final goal = Point(input.last.indexOf('.'), input.length - 1);
+    final walls = <Point<int>>{start + Point(0, -1), goal + Point(0, 1)};
 
     for (var y = 0; y < input.length; y++) {
       for (var x = 0; x < input[y].length; x++) {
         final character = input[y][x];
 
-        if (Direction.values.map((e) => e.character).contains(character)) {
-          var direction = Direction.parse(character);
+        if (Direction.values
+            .map((direction) => direction.character)
+            .contains(character)) {
           blizzards.add(
             Blizzard(
               Point(x, y),
-              direction,
+              Direction.parse(character),
               width: input[y].length,
               height: input.length,
             ),
@@ -32,33 +33,46 @@ class Day24 extends Day<List<String>, int> {
       }
     }
 
-    var current = <Point<int>>{start};
+    return Expedition(blizzards, walls, start: start, goal: goal);
+  }
+
+  @override
+  int processPart1(Expedition input) => _getFewestMinutes(input);
+
+  @override
+  int processPart2(Expedition input) {
+    var minutes = 0;
+    minutes += _getFewestMinutes(input);
+    minutes += _getFewestMinutes(input.reverse);
+    minutes += _getFewestMinutes(input);
+    return minutes;
+  }
+
+  int _getFewestMinutes(Expedition expedition) {
+    var current = <Point<int>>{expedition.start};
     var minutes = 0;
 
-    while (true) {
-      for (final blizzard in blizzards) {
+    while (!current.contains(expedition.goal)) {
+      for (final blizzard in expedition.blizzards) {
         blizzard.move();
       }
 
       final blizzardPositions =
-          blizzards.map((blizzard) => blizzard.position).toSet();
+          expedition.blizzards.map((blizzard) => blizzard.position).toSet();
       final next = <Point<int>>{};
 
       for (final position in current) {
         next.addAll(
-          {
+          [
             position,
             ...Direction.values.map((direction) => position + direction.offset),
-          }.where(
+          ].where(
             (position) =>
-                position.y >= 0 &&
-                !walls.contains(position) &&
+                !expedition.walls.contains(position) &&
                 !blizzardPositions.contains(position),
           ),
         );
       }
-
-      if (next.contains(goal)) break;
 
       current = next;
       minutes++;
@@ -66,6 +80,23 @@ class Day24 extends Day<List<String>, int> {
 
     return minutes;
   }
+}
+
+class Expedition {
+  const Expedition(
+    this.blizzards,
+    this.walls, {
+    required this.start,
+    required this.goal,
+  });
+
+  final Set<Blizzard> blizzards;
+  final Set<Point<int>> walls;
+  final Point<int> start;
+  final Point<int> goal;
+
+  Expedition get reverse =>
+      Expedition(blizzards, walls, start: goal, goal: start);
 }
 
 class Blizzard {
