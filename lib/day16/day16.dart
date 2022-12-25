@@ -55,23 +55,21 @@ class Day16 extends Day<Valve, int> {
   @override
   int processPart2(Valve input) {
     const totalTime = 26;
-    final pressureCandidates =
-        input.getPressureCandidates(timeRemaining: totalTime).toList();
-    final averagePressure = pressureCandidates
-        .map((opened) => opened.map((pressure) => pressure.value).sum)
-        .average;
-    return pressureCandidates
-        .where(
-          (opened) =>
-              opened.map((pressure) => pressure.value).sum >= averagePressure,
+    return input
+        .getPressureCandidates(timeRemaining: totalTime)
+        .sorted(
+          (a, b) => b.map((pressure) => pressure.value).sum.compareTo(
+                a.map((pressure) => pressure.value).sum,
+              ),
         )
+        .take(1)
         .map(
           (opened) => input
               .getPressureCandidates(timeRemaining: totalTime, opened: opened)
               .map((opened) => opened.map((pressure) => pressure.value).sum)
               .max,
         )
-        .max;
+        .single;
   }
 }
 
