@@ -17,9 +17,9 @@ class Day22 extends Day<Notes, int> {
               .padRight(gridWidth)
               .split('')
               .map((character) => Tile.parse(character))
-              .toList(),
+              .toList(growable: false),
         )
-        .toList();
+        .toList(growable: false);
     final directionsLine = input.skip(gridHeight + 1).first;
     final directions = RegExp(r'\d+|L|R')
         .allMatches(directionsLine)

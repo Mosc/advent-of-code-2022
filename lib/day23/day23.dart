@@ -26,7 +26,7 @@ class Day23 extends Day<Set<Elf>, int> {
   @override
   int processPart1(Set<Elf> input) {
     for (var i = 0; i < 10; i++) {
-      _runRound(input, i);
+      _runRound(input, round: i);
     }
 
     final positionsX = input.map((position) => position.x).toSet();
@@ -42,13 +42,13 @@ class Day23 extends Day<Set<Elf>, int> {
     var done = false;
 
     for (i = 0; !done; i++) {
-      done = _runRound(input, i);
+      done = _runRound(input, round: i);
     }
 
     return i;
   }
 
-  bool _runRound(Set<Elf> elves, int round) {
+  bool _runRound(Set<Elf> elves, {required int round}) {
     final proposedMoves = <Elf, Elf>{};
 
     for (final elf in elves) {

@@ -47,7 +47,10 @@ class Day19 extends Day<Iterable<Blueprint>, int> {
     final queue = Queue<State>.from([State(timeRemaining: timeRemaining)]);
     int highestGeodes = 0;
 
-    final resourceCosts = blueprint.costs.entries.toList().reversed;
+    final resourceCosts = blueprint.costs.entries
+        .toList(growable: false)
+        .reversed
+        .toList(growable: false);
     final spendableResources =
         resourceCosts.map((resourceCost) => resourceCost.value.keys).flattened;
     final maxRobots = {
