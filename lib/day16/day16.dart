@@ -2,11 +2,11 @@ import 'package:advent_of_code_2022/day.dart';
 import 'package:advent_of_code_2022/utils/pathfinding.dart';
 import 'package:collection/collection.dart';
 
-class Day16 extends Day<List<String>, int> {
+class Day16 extends Day<Valve, int> {
   const Day16() : super(16);
 
   @override
-  int processPart1(List<String> input) {
+  Valve preprocess(List<String> input) {
     final valveMap = <String, Valve>{};
 
     for (final line in input) {
@@ -40,9 +40,37 @@ class Day16 extends Day<List<String>, int> {
       );
     }
 
-    return start
-        .getPressureCandidates(timeRemaining: 30)
-        .map((pressures) => pressures.sum)
+    return start;
+  }
+
+  @override
+  int processPart1(Valve input) {
+    const totalTime = 30;
+    return input
+        .getPressureCandidates(timeRemaining: totalTime)
+        .map((opened) => opened.map((pressure) => pressure.value).sum)
+        .max;
+  }
+
+  @override
+  int processPart2(Valve input) {
+    const totalTime = 26;
+    final pressureCandidates =
+        input.getPressureCandidates(timeRemaining: totalTime).toList();
+    final averagePressure = pressureCandidates
+        .map((opened) => opened.map((pressure) => pressure.value).sum)
+        .average;
+    return pressureCandidates
+        .where(
+          (opened) =>
+              opened.map((pressure) => pressure.value).sum >= averagePressure,
+        )
+        .map(
+          (opened) => input
+              .getPressureCandidates(timeRemaining: totalTime, opened: opened)
+              .map((opened) => opened.map((pressure) => pressure.value).sum)
+              .max,
+        )
         .max;
   }
 }
@@ -63,7 +91,7 @@ class Valve {
   final Set<String> leadsTo;
   late Map<Valve, int> neighbors;
 
-  Iterable<List<int>> getPressureCandidates({
+  Iterable<List<MapEntry<Valve, int>>> getPressureCandidates({
     List<MapEntry<Valve, int>> opened = const [],
     required int timeRemaining,
   }) sync* {
@@ -74,14 +102,16 @@ class Valve {
 
     if (timeRemaining > 0 && relevantValves.isNotEmpty) {
       for (final valve in relevantValves) {
-        yield* valve.getPressureCandidates(
-          opened: [...opened, MapEntry(this, pressure)],
-          timeRemaining: timeRemaining - neighbors[valve]! - 1,
-        );
+        if (timeRemaining - neighbors[valve]! > 0) {
+          yield* valve.getPressureCandidates(
+            opened: [...opened, MapEntry(this, pressure)],
+            timeRemaining: timeRemaining - neighbors[valve]! - 1,
+          );
+        }
       }
-    } else {
-      yield [...opened.map((valve) => valve.value), pressure];
     }
+
+    yield [...opened, MapEntry(this, pressure)];
   }
 
   @override
