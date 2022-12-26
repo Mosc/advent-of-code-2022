@@ -50,12 +50,12 @@ class Day20 extends Day<List<MapEntry<int, int>>, List<MapEntry<int, int>>> {
 
 extension ListExtension<T> on List<T> {
   void move(int from, int to) {
-    var element = this[from];
+    final object = this[from];
     if (from < to) {
       setRange(from, to, this, from + 1);
     } else {
       setRange(to + 1, from + 1, this, to);
     }
-    this[to] = element;
+    this[to] = object;
   }
 }

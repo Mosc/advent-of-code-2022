@@ -40,13 +40,10 @@ class Day24 extends Day<Expedition, int> {
   int processPart1(Expedition input) => _getFewestMinutes(input);
 
   @override
-  int processPart2(Expedition input) {
-    var minutes = 0;
-    minutes += _getFewestMinutes(input);
-    minutes += _getFewestMinutes(input.reverse);
-    minutes += _getFewestMinutes(input);
-    return minutes;
-  }
+  int processPart2(Expedition input) =>
+      _getFewestMinutes(input) +
+      _getFewestMinutes(input.reversed) +
+      _getFewestMinutes(input);
 
   int _getFewestMinutes(Expedition expedition) {
     var current = <Point<int>>{expedition.start};
@@ -95,7 +92,7 @@ class Expedition {
   final Point<int> start;
   final Point<int> goal;
 
-  Expedition get reverse =>
+  Expedition get reversed =>
       Expedition(blizzards, walls, start: goal, goal: start);
 }
 

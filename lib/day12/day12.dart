@@ -37,7 +37,7 @@ class Day12 extends Day<List<String>, int> {
   @override
   int processPart2(List<String> input) {
     final grid = <List<int>>[];
-    final possibleStarts = <Point<int>>[];
+    final possibleStarts = <Point<int>>{};
     late Point<int> goal;
 
     for (final line in input) {
