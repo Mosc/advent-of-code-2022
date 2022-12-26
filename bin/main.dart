@@ -56,9 +56,14 @@ const _days = <Day>[
 ];
 
 Future<void> main() async {
+  final stopwatch = Stopwatch()..start();
+
   for (var day in _days) {
     if (filter.isEmpty || filter.contains(day.number)) {
       await day.calculate();
     }
   }
+
+  stopwatch.stop();
+  print('Total: ${stopwatch.elapsedMilliseconds}ms');
 }
