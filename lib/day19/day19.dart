@@ -98,6 +98,10 @@ class Day19 extends Day<Iterable<Blueprint>, int> {
           queue.add(state.buildRobot(costEntry.key, cost: costEntry.value));
         }
 
+        if (buildableRobots.length >= 3) {
+          continue;
+        }
+
         if (buildableRobots.contains(Resource.geode)) {
           continue;
         }
